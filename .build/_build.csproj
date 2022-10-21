@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace></RootNamespace>
+    <NoWarn>CS0649;CS0169</NoWarn>
+    <NukeRootDirectory>..</NukeRootDirectory>
+    <NukeScriptDirectory>..</NukeScriptDirectory>
+    <NukeTelemetryVersion>1</NukeTelemetryVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nuke.Common" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-07-18_14-49-45.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-07-18_14-51-40.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_11-49-08.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-11-15.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-11-23.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-20-08.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-23-38.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-21_10-34-49.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_11-49-08.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-11-15.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-11-23.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-20-08.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-12_12-23-38.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.2022-10-21_10-34-49.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.nuke\temp\build.log" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageDownload Include="GitVersion.Tool" Version="[5.10.3]" />
+  </ItemGroup>
+
+</Project>

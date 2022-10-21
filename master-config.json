@@ -1,0 +1,12 @@
+{
+  "-----------DB---------------------------------------------------------------------------- ": "",
+  "MsSqlConnection": "__PLACEHOLDER__",
+  "MySqlConnection": "__PLACEHOLDER__",
+  "PostgreSQLConnection": "__PLACEHOLDER__",
+  "MySqlVersion": "__PLACEHOLDER__",
+  "Provider": "Postgres",
+  "SkipDbUpgrade": "false",
+
+  "-----------ENCRYPTION---------------------------------------------------------------------------- ": "",
+  "CertificateKey": "__PLACEHOLDER__",
+}

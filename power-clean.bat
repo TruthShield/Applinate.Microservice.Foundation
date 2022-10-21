@@ -1,0 +1,1 @@
+Powershell.exe .\power-clean.ps1

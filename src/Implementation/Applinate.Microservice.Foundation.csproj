@@ -1,0 +1,115 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+	<Version>0.0.1</Version>
+	<Authors>Truth Shield</Authors>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<Title>Applinate Microservice Foundation</Title>
+    <Copyright>2022 Truthshield</Copyright>
+    <PackageProjectUrl>https://applinate.com/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TruthShield/Applinate.Microservice.Foundation</RepositoryUrl>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageLicenseFile>License.md</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageIcon>applinate-icon-128x128.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <SignAssembly>False</SignAssembly>
+    <Description>Want to build software right the first time to boost your teams productivity, avoid code rot, and produce highly scalable products?
+
+Applinate is a lightweight framework with conventions for building distributed, maintainable, and scalable software products.
+
+https://github.com/TruthShield/Applinate.Microservice.Foundation/
+
+---------------------------------------------------------------------
+
+Building any digital product is expensive, risky, and hard to get right.
+
+- Complexity balloons exponentially like a runaway freight train, so the longer your code base is around, the slower you go.  Many companies had to rebuild products from scratch (e.g., Apple, Facebook, Twitter, Ebay, and more).
+
+- Quality degrades rapidly because your solution is only as good as your weakest link, which means a single change can break your system and put you out of business.
+
+- Team efficiency is low, creating a lot of stress and wasting your time and money.
+
+Large companies can (sometimes) survive a rebuild, but for most, it's a death march.
+
+Want to avoid these typical software product problems?
+
+With a well-designed foundation, you can.
+
+Applinate is a framework for building top-quality software that's easy to scale, maintain, and change, so you won’t have to scrap everything and rebuild from scratch.  Doesn’t it make sense to isolate what you know will change, so you can change parts of your system without throwing out the baby with the bathwater?
+
+Applinate guides your team to build sustainable, scalable, and high-quality distributed microservices.  You can use Applinate today to extend your project or quickly build something new.
+
+- Establish guardrails for building agile software. Everyone knows technology and business move at different rates.  Applinate helps you isolate changes between things that change independently so your product can evolve, which significantly extends the life of your code base (and may save your company).
+
+- Construct your system on a bedrock of proven architectural patterns. Applinate leverages decades of knowledge, experience, and best practices from seasoned software architects. This way, your teams bypass unnecessary learning curves and mistakes, helping you avoid severe headaches (or worse) down the road.
+
+- Boost your teams’ productivity. Applinate gives you tools for encryption, compression, distributed messaging (CQRS/PubSub), caching, logging, and more, so you don’t waste time reinventing the wheel.
+
+- Prevent tech, vendor, and implementation lock-in. Applinate gives you a plugin convention to make it easy to build alternative implementations for any aspect of your system, so you don’t get locked into anything that doesn’t work for you.
+
+- Stop software rot. Applinate helps you separate your implementation from your interfaces. Your implementation can be (and should be) internal (only accessed through an interface), so you prevent unnecessary coupling, significantly extending the life of your products.
+
+With Applinate, you build on top of scalable, flexible, and proven microservice conventions designed to make your life easier.
+
+Testing, maintenance, and product evolution are simplified using Applinate.
+
+Try building with Applinate today. You'll extend your product's life, prevent expensive rebuilds, and add rocket fuel to your teams productivity. 
+
+	</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\applinate-icon-128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\License.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="AsyncFixer" Version="1.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.736">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	<PackageReference Include="dotnet-framework-sonarscanner" Version="5.8.0" />  
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+    <PackageReference Include="NJsonSchema" Version="10.8.0" />
+    <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
+  </ItemGroup>
+
+</Project>
