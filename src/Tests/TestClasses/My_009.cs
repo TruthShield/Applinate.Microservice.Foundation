@@ -29,7 +29,7 @@ namespace Applinate.Foundation.Test
         }
     }
 
-    [Service(ServiceType.Integration)]
+    [ServiceRequest(ServiceType.Integration)]
     public class My_009_UnitTestCommand : IReturn<My_009_UnitTestCommandResult>
     {
         public int PostNumber { get; set; }
@@ -44,7 +44,7 @@ namespace Applinate.Foundation.Test
         public RequestStatus Status => throw new System.NotImplementedException();
     }
 
-    [Service(ServiceType.Integration)]
+    [ServiceRequest(ServiceType.Integration)]
     public class My_009_UntiTestCommandExecutor : IHandleRequest<My_009_UnitTestCommand, My_009_UnitTestCommandResult>
     {
         public Task<My_009_UnitTestCommandResult> ExecuteAsync(

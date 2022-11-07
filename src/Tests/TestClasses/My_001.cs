@@ -2,7 +2,7 @@
 
 namespace Applinate.Foundation.Test
 {
-    [Service(ServiceType.Orchestration)]
+    [ServiceRequest(ServiceType.Orchestration)]
     public class My_001_UnitTestCommand : IReturn<My_001_UnitTestCommandResult>
     {
         public int PostNumber { get; set; }
@@ -17,7 +17,7 @@ namespace Applinate.Foundation.Test
         public RequestStatus Status => throw new NotImplementedException();
     }
 
-    [Service(ServiceType.Orchestration)]
+    [ServiceRequest(ServiceType.Orchestration)]
     public class My_001_UntiTestCommandExecutor : IHandleRequest<My_001_UnitTestCommand, My_001_UnitTestCommandResult>
     {
         public Task<My_001_UnitTestCommandResult> ExecuteAsync(

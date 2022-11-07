@@ -28,7 +28,7 @@ namespace Applinate
 
             var qry = from t in TypeRegistry.GetTypes()
                       where t.IsInterface
-                      let st = t.GetCustomAttribute<ServiceAttribute>()
+                      let st = t.GetCustomAttribute<ServiceRequestAttribute>()
                       where st != null
                       select t;
 
@@ -81,7 +81,7 @@ namespace Applinate
                     return;
                 }
 
-                var serviceAttribute = typeof(TInterface).GetCustomAttribute<ServiceAttribute>();
+                var serviceAttribute = typeof(TInterface).GetCustomAttribute<ServiceRequestAttribute>();
 
                 if (serviceAttribute is null)
                 {

@@ -101,7 +101,7 @@ namespace Applinate
 
         private static IEnumerable<string> GetCommandArgsWithoutAttributeErrors(Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
             from command in commands.Keys
-            let att = command.GetCustomAttribute<ServiceAttribute>(false)
+            let att = command.GetCustomAttribute<ServiceRequestAttribute>(false)
             let bypass = command.GetCustomAttribute<BypassSafetyChecksAttribute>(false)
             where att is null && bypass is not null
             select $@"
@@ -109,7 +109,7 @@ The type {command.Name} is used as input for
 {string.Join(", ", commands[command].Values.SelectMany(x => x.Select(z => $"{z.Name}.ExecuteAsync({command.Name}){{}}")).ToArray())}.
 
 This requires the command to specify the 
-{typeof(ServiceAttribute)}, which must be 
+{typeof(ServiceRequestAttribute)}, which must be 
 {ServiceType.Orchestration}, {ServiceType.Calculation}, {ServiceType.Integration}, or {ServiceType.Tool}.
 
 expecting:
@@ -120,11 +120,11 @@ class {command.Name}{{...}}
 
         private static IEnumerable<string> GetCommandHandlerScopeMismatches(Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
             from x in commands
-            let commandAtt = x.Key.GetCustomAttribute<ServiceAttribute>()
+            let commandAtt = x.Key.GetCustomAttribute<ServiceRequestAttribute>()
             let commandType = commandAtt?.CommandType ?? ServiceType.None
             from y in x.Value
             from z in y.Value
-            let executorAtt = z.GetCustomAttribute<ServiceAttribute>()
+            let executorAtt = z.GetCustomAttribute<ServiceRequestAttribute>()
             let executorType = executorAtt?.CommandType ?? ServiceType.None
             where commandType != executorType
             select $@"
@@ -136,12 +136,12 @@ The command and executors must be for the same scope.
 
 Expecting: 
 
-[{typeof(ServiceAttribute)}({nameof(ServiceAttribute.CommandType)}.{commandType})]
+[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.CommandType)}.{commandType})]
 class {z.Name}{{...}}
 
 or...
 
-[{typeof(ServiceAttribute)}({nameof(ServiceAttribute.CommandType)}.{executorType})]
+[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.CommandType)}.{executorType})]
 class {x.Key.Name}{{...}}
 
 ";
@@ -150,19 +150,19 @@ class {x.Key.Name}{{...}}
             from x in commands
             from y in x.Value
             from z in y.Value
-            let att = z.GetCustomAttribute<ServiceAttribute>()
+            let att = z.GetCustomAttribute<ServiceRequestAttribute>()
             let att2 = z.GetCustomAttribute<BypassSafetyChecksAttribute>()
             where att is null && att2 is null
             select $@"
 The type {z.Name} is a command executor.
 
 This requires the class to specify the 
-{typeof(ServiceAttribute)}, which must be 
+{typeof(ServiceRequestAttribute)}, which must be 
 {ServiceType.Orchestration}, {ServiceType.Calculation}, {ServiceType.Integration}, or {ServiceType.Tool}.
 
 expecting:
 
-[{typeof(ServiceAttribute)}()]
+[{typeof(ServiceRequestAttribute)}()]
 class {z.Name}{{...}}
 
 ";
@@ -187,7 +187,7 @@ Remove {executor.Name} or the other duplicate command definition.
 
         private static IEnumerable<Type> GetExecutors(Type[] types) =>
             from t in types
-            let att = t.GetCustomAttribute<ServiceAttribute>()
+            let att = t.GetCustomAttribute<ServiceRequestAttribute>()
             where att != null && att.CommandType != ServiceType.None
             select t;
 
@@ -210,7 +210,7 @@ class {x.Key}{{...}}";
             select $@"
 Type: {keyType} 
 Assembly: '{keyType.Assembly.GetName().Name}' 
-Error: the type has a [{nameof(ServiceAttribute)}({typeof(ServiceType)})] attribute, 
+Error: the type has a [{nameof(ServiceRequestAttribute)}({typeof(ServiceType)})] attribute, 
 but is not defined in any command executor.
 
 Either remove {keyType} or create a {typeof(IHandleRequest<,>).Name} 
@@ -267,7 +267,7 @@ that takes a command of type {keyType}.
         {
             var commandInputsLookup =
             (from t in types
-             let att = t.GetCustomAttribute<ServiceAttribute>(false)
+             let att = t.GetCustomAttribute<ServiceRequestAttribute>(false)
              where att is not null
              where !IsGenerator(t)
              select new { t, att.CommandType })

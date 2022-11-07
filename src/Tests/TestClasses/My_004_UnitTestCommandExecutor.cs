@@ -1,7 +1,7 @@
 // Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    [Service(ServiceType.Orchestration)]
+    [ServiceRequest(ServiceType.Orchestration)]
     public class My_004_UnitTestCommandExecutor : IHandleRequest<My_004_UnitTestCommand, My_004_UnitTestCommandResult>
     {
         public Task<My_004_UnitTestCommandResult> ExecuteAsync(

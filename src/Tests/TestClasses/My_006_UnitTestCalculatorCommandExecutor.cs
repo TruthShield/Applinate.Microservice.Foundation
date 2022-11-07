@@ -1,7 +1,7 @@
 // Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    [Service(ServiceType.Calculation)]
+    [ServiceRequest(ServiceType.Calculation)]
     public class My_006_UnitTestCalculatorCommandExecutor : IHandleRequest<My_006_UnitTestCalculatorCommand, My_006_UnitTestCalculatorCommandResult>
     {
         public async Task<My_006_UnitTestCalculatorCommandResult> ExecuteAsync(

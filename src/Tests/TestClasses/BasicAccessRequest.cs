@@ -1,7 +1,7 @@
 // Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    [Service(ServiceType.Integration)]
+    [ServiceRequest(ServiceType.Integration)]
     public class BasicIntegrationRequest : IReturn<BasicIntegrationResponse>
     {
         public int PostNumber { get; set; }
@@ -16,7 +16,7 @@ namespace Applinate.Foundation.Test
         public RequestStatus Status => throw new NotImplementedException();
     }
 
-    [Service(ServiceType.Integration)]
+    [ServiceRequest(ServiceType.Integration)]
     public class BasicIntegrationTestExecutor : IHandleRequest<BasicIntegrationRequest, BasicIntegrationResponse>
     {
         public Task<BasicIntegrationResponse> ExecuteAsync(BasicIntegrationRequest arg, CancellationToken cancellationToken = default)

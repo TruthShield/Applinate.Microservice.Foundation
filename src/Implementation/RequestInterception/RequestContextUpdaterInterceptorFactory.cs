@@ -14,7 +14,7 @@ namespace Applinate.Foundation.Commands.Interceptors
             CancellationToken cancellationToken) 
         {
             var currentServiceType = RequestContext.Current.ServiceType;
-            var attribute          = typeof(TArg).GetCustomAttribute<ServiceAttribute>();
+            var attribute          = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>();
             var nextServiceType    = attribute?.CommandType ?? ServiceType.None;
 
 
