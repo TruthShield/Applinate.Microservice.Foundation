@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-
+    using Microsoft.Extensions.DependencyInjection;
 
     [Service(ServiceType.Orchestration)]
     public interface IMy_0010_Service
