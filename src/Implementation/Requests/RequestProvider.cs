@@ -83,9 +83,9 @@ namespace Applinate
         {
             var errors =
                  GetMissingAttributes(commandInputs)
-                 .Union(GetCommandHandlersWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
+                 //.Union(GetCommandHandlersWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
                  .Union(GetCommandArgsWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
-                 .Union(GetCommandHandlerScopeMismatches(commands), StringComparer.OrdinalIgnoreCase)
+                 //.Union(GetCommandHandlerScopeMismatches(commands), StringComparer.OrdinalIgnoreCase)
                  .Union(GetDupeCommandErrors(commands), StringComparer.OrdinalIgnoreCase)
                  .ToArray();
 
