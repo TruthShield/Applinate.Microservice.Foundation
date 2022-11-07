@@ -53,7 +53,7 @@ namespace Applinate
                 }
 
                 var proxyQry =
-                from t in TypeRegistry.GetTypes()
+                from t in TypeRegistry.Types
                 where t.IsAssignableTo(typeof(RequestInterceptorBase<TArg, TResult>)) &&
                 t != typeof(RequestInterceptorBase<TArg, TResult>)
                 let att = t.GetCustomAttribute<InterceptAttribute>()
@@ -62,7 +62,7 @@ namespace Applinate
                     as InterceptorRecord<TArg, TResult>;
 
                 var factoryQry =
-                    (from t in TypeRegistry.GetTypes()
+                    (from t in TypeRegistry.Types
                      where t.IsAssignableTo(typeof(InterceptorFactoryBase)) &&
                      t != typeof(InterceptorFactoryBase)
                      let att = t.GetCustomAttribute<InterceptAttribute>()

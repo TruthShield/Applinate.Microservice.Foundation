@@ -232,7 +232,7 @@ that takes a command of type {keyType}.
                     return;
                 }
 
-                var q = TypeRegistry.GetTypes().Where(x => x.IsClass).ToArray();
+                var q = TypeRegistry.Types.Where(x => x.IsClass).ToArray();
 
                 PopulateRegistry(q);
 

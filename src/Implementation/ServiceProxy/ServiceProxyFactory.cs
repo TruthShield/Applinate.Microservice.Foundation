@@ -26,7 +26,7 @@ namespace Applinate
 
             _Initialized = true;
 
-            var qry = from t in TypeRegistry.GetTypes()
+            var qry = from t in TypeRegistry.Types
                       where t.IsInterface
                       let st = t.GetCustomAttribute<ServiceAttribute>()
                       where st != null

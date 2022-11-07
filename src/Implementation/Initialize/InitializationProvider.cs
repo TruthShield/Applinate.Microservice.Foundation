@@ -45,7 +45,7 @@ namespace Applinate
 
         private static void ExecuteFoundInitializers(IServiceCollection services, bool testing)
         {
-            var q = from x in TypeRegistry.GetTypes()
+            var q = from x in TypeRegistry.Types
                     where x.IsClass && x.IsAssignableTo(typeof(IInitialize))
                     let ordinal = x.GetCustomAttribute<InitializationPriorityAttribute>()?.Ordinal ?? int.MaxValue
                     orderby ordinal 

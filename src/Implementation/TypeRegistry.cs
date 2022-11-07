@@ -1,5 +1,6 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -12,46 +13,41 @@ namespace Applinate
     {
         private static readonly object _InitializedLock = new object();
         private static bool _LoadFromDisk = true;
-        private static Type[]? _Types;
-        public static bool LoadFromDisk { get { return _LoadFromDisk; }
-            set { 
-            
-                if(_Types is null)
+
+        private static readonly Lazy<Type[]> _MyTypes = new Lazy<Type[]>(GetTypes);
+        private static readonly Lazy<Type[]> _MyClasses = new Lazy<Type[]>(() => Types.Where(x => x.IsClass).ToArray());
+
+        public static Type[] Types => _MyTypes.Value;
+        public static Type[] Classes => _MyClasses.Value;
+
+
+
+
+        public static bool LoadFromDisk
+        {
+            get { return _LoadFromDisk; }
+            set
+            {
+
+                if (! _MyTypes.IsValueCreated)
                 {
                     _LoadFromDisk = value;
                 }
 
-                if(value == _LoadFromDisk)
+                if (value == _LoadFromDisk)
                 {
                     return;
                 }
 
-                throw new InvalidOperationException("types have alredy been loaded, can not change loading strategy post-load");            
+                throw new InvalidOperationException("types have alredy been loaded, can not change loading strategy post-load");
             }
         }
 
-        [STAThread]
-        public static IEnumerable<Type> GetTypes()
-        {
-            if (_Types is not null)
-            {
-                return _Types;
-            }
-
-            lock (_InitializedLock)
-            {
-                if (_Types is not null)
-                {
-                    return _Types;
-                }
-
-                var serviceAssemblies = _LoadFromDisk? GetServiceAssemblies() : GetDirectAssemblies();
-
-                _Types = serviceAssemblies.SelectMany(x => x.GetTypes()).Where(IsNotAnonymousType).Distinct().ToArray();
-
-                return _Types;
-            }
-        }
+        private static Type[] GetTypes() => 
+            (_LoadFromDisk ? GetServiceAssemblies() : GetDirectAssemblies())
+            .SelectMany(x => x.GetTypes()).Where(IsNotAnonymousType)
+            .Distinct()
+            .ToArray();
 
         public static Boolean IsNotAnonymousType(Type type)
         {
@@ -122,7 +118,7 @@ namespace Applinate
                 .Select(x => Assembly.Load(x))
                 .ToArray();
 
-        static bool IsServiceAssembly(AssemblyName a) => 
+        private static bool IsServiceAssembly(AssemblyName a) => 
             IsServiceAssembly(a?.Name ?? String.Empty);
 
         private static bool IsServiceAssembly(string name) => 
