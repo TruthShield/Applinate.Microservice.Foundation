@@ -8,7 +8,7 @@ namespace Applinate
     /// <typeparam name="TArg">The type of the input argument.</typeparam>
     /// <typeparam name="TResult">The type of the result.</typeparam>
     public interface IHandleRequest<TArg, TResult> 
-        where TArg : IReturn<TResult> 
+        where TArg : class, IReturn<TResult> 
         where TResult : class, IHaveRequestStatus
     {
         /// <summary>

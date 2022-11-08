@@ -4,9 +4,9 @@ namespace Applinate
 {
     using System.Reflection;
 
-    internal static class RequestHandlerFactoryRegistryBuilder
+    internal static class RequestHandlerRegistryBuilder
     {
-        internal static NestedDictionary<Type, Type, IHandlerFactory> BuildRegistry()
+        internal static NestedDictionary<Type, Type, IRequestHandlerRegistry> BuildRegistry()
         {
             var commandInputsLookup =
             (from t in TypeRegistry.Classes
@@ -70,9 +70,9 @@ namespace Applinate
             return result;
         }
 
-        private static NestedDictionary<Type, Type, IHandlerFactory> RegisterMessageCommands(IEnumerable<IGrouping<(Type inputType, Type outputType), Type>> groups)
+        private static NestedDictionary<Type, Type, IRequestHandlerRegistry> RegisterMessageCommands(IEnumerable<IGrouping<(Type inputType, Type outputType), Type>> groups)
         {
-            var result = new NestedDictionary<Type, Type, IHandlerFactory>();
+            var result = new NestedDictionary<Type, Type, IRequestHandlerRegistry>();
             foreach (var handlerGroup in groups)
             {
                 var inputType = handlerGroup.Key.inputType;
@@ -84,7 +84,7 @@ namespace Applinate
             return result;
         }
 
-        private class MessageHandlerFactory : IHandlerFactory
+        private class MessageHandlerFactory : IRequestHandlerRegistry
         {
             public MessageHandlerFactory(Type argType, Type resultType, Type implementationType)
             {
@@ -97,7 +97,7 @@ namespace Applinate
             public Type ImplementationType { get; }
             public Type ResultType { get; }
 
-            public IHandleRequest<TArg1, TResult1> Build<TArg1, TResult1>()
+            public IHandleRequest<TArg1, TResult1> GetRequestHandler<TArg1, TResult1>()
                 where TArg1 : class, IReturn<TResult1>
                 where TResult1 : class, IHaveRequestStatus
             {
@@ -115,9 +115,9 @@ namespace Applinate
             }
         }
 
-        private class ServiceHandlerFactory : IHandlerFactory
+        private class ServiceHandlerFactory : IRequestHandlerRegistry
         {
-            IHandleRequest<TArg1, TResult1> IHandlerFactory.Build<TArg1, TResult1>()
+            IHandleRequest<TArg1, TResult1> IRequestHandlerRegistry.GetRequestHandler<TArg1, TResult1>()
             {
                 throw new NotImplementedException();
             }

@@ -11,10 +11,6 @@ namespace Applinate
     /// </summary>
     public static class RequestHandlerProvider
     {
-        private static readonly Lazy<NestedDictionary<Type, Type, IHandlerFactory>> _RequestHandlerFactoryRegistry = new(RequestHandlerFactoryRegistryBuilder.BuildRegistry);
-
-        private static NestedDictionary<Type, Type, IHandlerFactory> RequestHandlerFactoryRegistry => _RequestHandlerFactoryRegistry.Value;
-
         /// <summary>
         /// Executes the specified command.  If possible the preferred usage is asynchronous as
         /// <see cref="ExecuteAsync{TResult}(IReturn{TResult}, CancellationToken)"/> which should be used
@@ -50,7 +46,7 @@ namespace Applinate
                 {
                     var t = command.GetType();
 
-                    var mi =  typeof(RequestHandlerProvider).GetMethod(nameof(InternalExecuteAsync), BindingFlags.Static | BindingFlags.NonPublic);
+                    var mi = typeof(RequestHandlerProvider).GetMethod(nameof(InternalExecuteAsync), BindingFlags.Static | BindingFlags.NonPublic);
                     var mi2 = mi?.MakeGenericMethod(command.GetType(), typeof(TResult));
                     var result = mi2?.Invoke(null, new object[] { command, cancellationToken });
 
@@ -64,35 +60,9 @@ namespace Applinate
             where TArg : class, IReturn<TResult>
             where TResult : class, IHaveRequestStatus
         {
-            var commandExecutor = ServiceProvider.Locate<IRequestHandler>();
+            var commandExecutor = ServiceProvider.Locate<IExecuteRequest>();
             var executorResult = await commandExecutor.ExecuteAsync<TArg, TResult>(arg, cancellationToken).ConfigureAwait(false);
             return executorResult;
-        }
-
-        internal static Task<TResult> Ex<TRequest, TResult>(TRequest request, CancellationToken cancellationToken)
-            where TRequest : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus =>
-            GetRegisteredHandler<TRequest, TResult>().ExecuteAsync(request, cancellationToken);
-
-        internal static IHandleRequest<TArg, TResult> GetRegisteredHandler<TArg, TResult>()
-            where TArg : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus
-        {
-            var key1 = typeof(TArg);
-            var key2 = typeof(TResult);
-
-            if (!RequestHandlerFactoryRegistry.ContainsKey(key1, key2))
-            {
-                // fault on execution because the behavior may be overriden by an interceptor
-                return new FaultGeneratingCommandExecutor<TArg, TResult>(() =>
-                    ExceptionFactory.NoDefinedService<TArg, TResult>());
-            }
-
-            var factory = RequestHandlerFactoryRegistry[key1][key2];
-
-            var instance = factory.Build<TArg, TResult>();
-
-            return instance ?? throw ExceptionFactory.NoDefinedService<TArg, TResult>();
         }
     }
 }

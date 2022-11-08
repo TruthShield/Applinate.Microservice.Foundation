@@ -2,7 +2,7 @@
 
 namespace Applinate
 {
-    public interface IRequestHandler
+    internal interface IExecuteRequest
     {
         Task<TResult> ExecuteAsync<TArg, TResult>(TArg arg, CancellationToken cancellationToken = default)
             where TArg : class, IReturn<TResult>
