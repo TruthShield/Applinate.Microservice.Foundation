@@ -9,13 +9,13 @@ namespace Applinate.Test
 
     /// <summary>
     /// Class MockCommandExecutor. This class cannot be inherited.
-    /// Implements the <see cref="Applinate.IHandleRequest{TArg, TResult}" />
+    /// Implements the <see cref="Applinate.IRequestHandler{TArg, TResult}" />
     /// </summary>
     /// <typeparam name="TArg">The type of the t argument.</typeparam>
     /// <typeparam name="TResult">The type of the t result.</typeparam>
-    /// <seealso cref="Applinate.IHandleRequest{TArg, TResult}" />
+    /// <seealso cref="Applinate.IRequestHandler{TArg, TResult}" />
     [BypassSafetyChecks]
-    internal sealed class MockCommandExecutor<TArg, TResult> : IHandleRequest<TArg, TResult>
+    internal sealed class MockCommandExecutor<TArg, TResult> : IRequestHandler<TArg, TResult>
         where TArg : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
     {

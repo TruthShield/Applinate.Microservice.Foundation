@@ -26,13 +26,13 @@ namespace Applinate
                 Applinate.RequestContext.Current = Applinate.RequestContext.Current with { ServiceType = ServiceType.Orchestration };
 
                 var services = ServiceProvider.ServiceCollection;
-                ServiceProvider.RegisterSingleton<IExecuteRequest, DefaultRequestExecutor>();
+                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
 
                 ExecuteFoundInitializers(services, testing);
 
                 WireUpEventListeners();
 
-                ServiceProvider.RegisterSingleton<IExecuteRequest, DefaultRequestExecutor>();
+                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
 
                 initialized = true;
                 

@@ -2,7 +2,7 @@
 
 namespace Applinate
 {
-    public interface IHandleCommand<TArg> : IHandleRequest<TArg, CommandResponse>
+    public interface ICommandHandler<TArg> : IRequestHandler<TArg, CommandResponse>
     where TArg : class, IReturn<CommandResponse>
     { }
 }

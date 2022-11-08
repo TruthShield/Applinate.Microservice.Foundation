@@ -15,7 +15,7 @@ namespace Applinate
         private static InterceptorRecord<TArg, TResult>[]? _ProxyTypes;
 
         //[DebuggerHidden]
-        public static async Task<TResult> Execute(IHandleRequest<TArg, TResult> command, TArg arg, CancellationToken cancellationToken)
+        public static async Task<TResult> Execute(IRequestHandler<TArg, TResult> command, TArg arg, CancellationToken cancellationToken)
         {
             var interceptorTypes = GetProxyTypes();
 

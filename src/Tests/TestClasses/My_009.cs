@@ -45,7 +45,7 @@ namespace Applinate.Foundation.Test
     }
 
     [ServiceRequest(ServiceType.Integration)]
-    public class My_009_UntiTestCommandExecutor : IHandleRequest<My_009_UnitTestCommand, My_009_UnitTestCommandResult>
+    public class My_009_UntiTestCommandExecutor : IRequestHandler<My_009_UnitTestCommand, My_009_UnitTestCommandResult>
     {
         public Task<My_009_UnitTestCommandResult> ExecuteAsync(
             My_009_UnitTestCommand arg,

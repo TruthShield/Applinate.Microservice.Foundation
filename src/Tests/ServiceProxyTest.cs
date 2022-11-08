@@ -18,17 +18,17 @@ namespace Applinate.Foundation.Test
             _ = response;
         }
 
-        //[Fact]
-        //public async Task HandleRequestFromInterfaceImplementation()
-        //{
-        //    var proxy = ServiceProvider.Locate<IMy_011_Service>();// ServiceProxyFactory.Build<IMy_0010_Service>();
-        //    var response = await proxy.HandleRequestAsync(new()
-        //    {
-        //        Value = 123
-        //    });
+        [Fact(Skip = "Wip")]
+        public async Task HandleRequestFromInterfaceImplementation()
+        {
+            var proxy = ServiceProvider.Locate<IMy_011_Service>();// ServiceProxyFactory.Build<IMy_0010_Service>();
+            var response = await proxy.HandleRequestAsync(new()
+            {
+                Value = 123
+            });
 
-        //    response.Value.Should().Be(123);
-        //}
+            response.Value.Should().Be(123);
+        }
 
     }
 }

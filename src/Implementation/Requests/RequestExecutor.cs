@@ -3,7 +3,7 @@
 namespace Applinate
 {
     using System.Diagnostics;
-    internal class DefaultRequestExecutor : IExecuteRequest
+    internal class RequestExecutor : IRequestExecutor
     {
         public async Task<TResult> ExecuteAsync<TArg, TResult>(
             TArg arg,
@@ -25,7 +25,7 @@ namespace Applinate
 
         private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> RequestHandlers => _RequestHandlers.Value;
 
-        private static IHandleRequest<TArg, TResult> GetHandler<TArg, TResult>()
+        private static IRequestHandler<TArg, TResult> GetHandler<TArg, TResult>()
         where TArg : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
         {

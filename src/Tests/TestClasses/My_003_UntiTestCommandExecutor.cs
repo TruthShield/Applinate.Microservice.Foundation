@@ -2,7 +2,7 @@
 namespace Applinate.Foundation.Test
 {
     [ServiceRequest(ServiceType.Orchestration)]
-    public class My_003_UntiTestCommandExecutor : IHandleRequest<My_003_UnitTestCommand, My_003_UnitTestCommandResult>
+    public class My_003_UntiTestCommandExecutor : IRequestHandler<My_003_UnitTestCommand, My_003_UnitTestCommandResult>
     {
         public Task<My_003_UnitTestCommandResult> ExecuteAsync(
             My_003_UnitTestCommand arg,

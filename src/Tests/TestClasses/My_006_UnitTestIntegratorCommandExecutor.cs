@@ -2,7 +2,7 @@
 namespace Applinate.Foundation.Test
 {
     [ServiceRequest(ServiceType.Integration)]
-    public class My_006_UnitTestIntegratorCommandExecutor : IHandleRequest<My_006_UnitTestIntegratorCommand, My_006_UnitTestIntegratorCommandResult>
+    public class My_006_UnitTestIntegratorCommandExecutor : IRequestHandler<My_006_UnitTestIntegratorCommand, My_006_UnitTestIntegratorCommandResult>
     {
         public Task<My_006_UnitTestIntegratorCommandResult> ExecuteAsync(
             My_006_UnitTestIntegratorCommand arg,

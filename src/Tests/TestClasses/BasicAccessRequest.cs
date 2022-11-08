@@ -17,7 +17,7 @@ namespace Applinate.Foundation.Test
     }
 
     [ServiceRequest(ServiceType.Integration)]
-    public class BasicIntegrationTestExecutor : IHandleRequest<BasicIntegrationRequest, BasicIntegrationResponse>
+    public class BasicIntegrationTestExecutor : IRequestHandler<BasicIntegrationRequest, BasicIntegrationResponse>
     {
         public Task<BasicIntegrationResponse> ExecuteAsync(BasicIntegrationRequest arg, CancellationToken cancellationToken = default)
         {

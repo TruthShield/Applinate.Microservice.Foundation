@@ -60,7 +60,7 @@ namespace Applinate
             where TArg : class, IReturn<TResult>
             where TResult : class, IHaveRequestStatus
         {
-            var commandExecutor = ServiceProvider.Locate<IExecuteRequest>();
+            var commandExecutor = ServiceProvider.Locate<IRequestExecutor>();
             var executorResult = await commandExecutor.ExecuteAsync<TArg, TResult>(arg, cancellationToken).ConfigureAwait(false);
             return executorResult;
         }

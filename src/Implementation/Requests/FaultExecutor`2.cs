@@ -3,7 +3,7 @@
 namespace Applinate
 {
     [BypassSafetyChecks]
-    internal sealed class FaultGeneratingCommandExecutor<TArg, TResult> : IHandleRequest<TArg, TResult>
+    internal sealed class FaultGeneratingCommandExecutor<TArg, TResult> : IRequestHandler<TArg, TResult>
         where TArg : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
     {

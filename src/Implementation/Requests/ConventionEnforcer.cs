@@ -9,7 +9,7 @@ namespace Applinate
         private static bool IsGenerator(Type t)
         {
             var q = from i in t.GetInterfaces()
-                    where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandleRequest<,>)
+                    where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)
                     select i;
 
             var result = q.Any();
@@ -36,7 +36,7 @@ namespace Applinate
              from i in commandType.GetInterfaces()
              where i.IsGenericType
              let igtd = i.GetGenericTypeDefinition()
-             where igtd == typeof(IHandleRequest<,>)
+             where igtd == typeof(IRequestHandler<,>)
              let inputType = i.GetGenericArguments()[0]
              let outputType = i.GetGenericArguments()[1]
              select new { inputType, outputType, commandType })
@@ -180,7 +180,7 @@ Assembly: '{keyType.Assembly.GetName().Name}'
 Error: the type has a [{nameof(ServiceRequestAttribute)}({typeof(ServiceType)})] attribute, 
 but is not defined in any command executor.
 
-Either remove {keyType} or create a {typeof(IHandleRequest<,>).Name} 
+Either remove {keyType} or create a {typeof(IRequestHandler<,>).Name} 
 that takes a command of type {keyType}.
 ";
 

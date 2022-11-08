@@ -7,7 +7,7 @@ namespace Applinate
     /// </summary>
     /// <typeparam name="TArg">The type of the input argument.</typeparam>
     /// <typeparam name="TResult">The type of the result.</typeparam>
-    public interface IHandleRequest<TArg, TResult> 
+    public interface IRequestHandler<TArg, TResult> 
         where TArg : class, IReturn<TResult> 
         where TResult : class, IHaveRequestStatus
     {
