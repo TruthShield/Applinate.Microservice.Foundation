@@ -84,13 +84,11 @@ namespace Applinate
             {
             }
 
-            //[DebuggerHidden]
             public override InterceptorBase<TArg2, TResult2> GetInterceptor(ExecuteDelegate<TArg2, TResult2> core)
             {
                 return new InterceptorBase<TArg2, TResult2>(async (a, r) => await Execute(core, a, r).ConfigureAwait(false));
             }
 
-            //[DebuggerHidden]
             private Task<TResult2?> Execute(ExecuteDelegate<TArg2, TResult2> core, TArg2 a, CancellationToken r)
             {
                 var instance = Activator.CreateInstance(Type) as InterceptorFactoryBase;

@@ -18,7 +18,7 @@ namespace Applinate.Foundation.Test
             _ = response;
         }
 
-        [Fact(Skip = "Wip")]
+        [Fact()]
         public async Task HandleRequestFromInterfaceImplementation()
         {
             var proxy = ServiceProvider.Locate<IMy_011_Service>();// ServiceProxyFactory.Build<IMy_0010_Service>();

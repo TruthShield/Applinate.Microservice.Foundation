@@ -61,15 +61,16 @@ namespace Applinate
                 from m in i.GetMethods()
                 let args = m.GetParameters()
                 where args.Length == 1 ||
-                   (args.Length == 2 && args[1].ParameterType is CancellationToken)
+                   (args.Length == 2 && args[1].ParameterType == typeof( CancellationToken))
                 let ret = m.ReturnParameter.ParameterType
                 where ret.GetGenericTypeDefinition() == typeof(Task<>)
                 let innerRet = ret.GetGenericArguments()[0]
-                let targetType = typeof(IReturn<>).MakeGenericType(ret)
-                where innerRet.IsAssignableTo(targetType)
+                let a0 = args[0].ParameterType
+                let targetType = typeof(IReturn<>).MakeGenericType(innerRet)
+                where a0.IsAssignableTo(targetType)
                 select (innerRet, args[0].ParameterType, m, c, i);
 
-            var items = qry.GroupBy(x => (x.ParameterType, x.innerRet));
+            var items = qry.GroupBy(x => (x.ParameterType, x.innerRet)).ToArray();
 
             var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder[]>();
 
