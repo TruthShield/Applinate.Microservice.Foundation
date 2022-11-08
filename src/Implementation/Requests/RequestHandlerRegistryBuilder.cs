@@ -8,14 +8,20 @@ namespace Applinate
 
     internal static class RequestHandlerRegistryBuilder
     {
-        internal static NestedDictionary<Type, Type, IRequestHandlerBuilder> BuildRegistry()
+        internal static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildHandlerRegistry()
         {
-            
+            ConventionEnforcer.AssertConventions();
 
-            // TODO: check for errors
+            var handlers = BuildMessageCommanHandlers();
 
-           
+            // todo: add service handlers here
 
+            return handlers;
+        }
+
+  
+        private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildMessageCommanHandlers()
+        {
             var commandHandlers =
                 (from t in TypeRegistry.Classes
                  from i in t.GetInterfaces()
@@ -32,22 +38,16 @@ namespace Applinate
                 .Distinct()
                 .GroupBy(x => (x.inputType, x.outputType), x => x.t);
 
-            ConventionEnforcer.AssertConventions();
-
-            return RegisterMessageCommands(groups);
-        }
-
-  
-        private static NestedDictionary<Type, Type, IRequestHandlerBuilder> RegisterMessageCommands(IEnumerable<IGrouping<(Type inputType, Type outputType), Type>> groups)
-        {
-            var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder>();
+            var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder[]>();
 
             foreach (var handlerGroup in groups)
             {
                 var inputType = handlerGroup.Key.inputType;
                 var outputType = handlerGroup.Key.outputType;
 
-                result.Add(inputType, outputType, new MessageRequestHandlerBuilder(inputType, outputType, handlerGroup.First()));
+                var handlers = handlerGroup.Select(x => new MessageRequestHandlerBuilder(inputType, outputType, x)).ToArray();
+
+                result.Add(inputType, outputType, handlers);
             }
 
             return result;
