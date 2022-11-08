@@ -12,7 +12,7 @@ namespace Applinate
             where TArg : class, IReturn<TResult>
             where TResult : class, IHaveRequestStatus
         {
-            var instance = RequestProvider.GetRegisteredHandler<TArg, TResult>();
+            var instance = RequestHandlerProvider.GetRegisteredHandler<TArg, TResult>();
 
             var result = await RequestInterceptorHelper<TArg, TResult>.Execute(
                 instance,
