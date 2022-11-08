@@ -21,9 +21,9 @@ namespace Applinate
             return result;
         }
 
-        private static readonly Lazy<NestedDictionary<Type, Type, IRequestHandlerRegistry>> _RequestHandlers = new(RequestHandlerRegistryBuilder.BuildRegistry);
+        private static readonly Lazy<NestedDictionary<Type, Type, IRequestHandlerBuilder>> _RequestHandlers = new(RequestHandlerRegistryBuilder.BuildRegistry);
 
-        private static NestedDictionary<Type, Type, IRequestHandlerRegistry> RequestHandlers => _RequestHandlers.Value;
+        private static NestedDictionary<Type, Type, IRequestHandlerBuilder> RequestHandlers => _RequestHandlers.Value;
 
         private static IHandleRequest<TArg, TResult> GetHandler<TArg, TResult>()
         where TArg : class, IReturn<TResult>
@@ -41,7 +41,7 @@ namespace Applinate
 
             var factory = RequestHandlers[key1][key2];
 
-            var instance = factory.GetRequestHandler<TArg, TResult>();
+            var instance = factory.BuildRequestHandler<TArg, TResult>();
 
             return instance ?? throw ExceptionFactory.NoDefinedService<TArg, TResult>();
         }

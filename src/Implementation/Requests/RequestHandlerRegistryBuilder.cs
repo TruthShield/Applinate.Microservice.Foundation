@@ -3,41 +3,18 @@
 namespace Applinate
 {
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     internal static class RequestHandlerRegistryBuilder
     {
-        internal static NestedDictionary<Type, Type, IRequestHandlerRegistry> BuildRegistry()
+        internal static NestedDictionary<Type, Type, IRequestHandlerBuilder> BuildRegistry()
         {
-            var commandInputsLookup =
-            (from t in TypeRegistry.Classes
-             let att = t.GetCustomAttribute<ServiceRequestAttribute>(false)
-             where att is not null
-             where !IsGenerator(t)
-             select new { t, att.CommandType })
-             .Distinct()
-             .GroupBy(x => x.t)
-             .ToDictionary(x => x.Key, x => x.ToArray());
+            
 
             // TODO: check for errors
 
-            var commandInputs = commandInputsLookup.ToDictionary(x => x.Key, x => x.Value[0].CommandType);
-
-            var commands = // input, output, command (note: should be one)
-            (from commandType in TypeRegistry.Classes
-             from i in commandType.GetInterfaces()
-             where i.IsGenericType
-             let igtd = i.GetGenericTypeDefinition()
-             where igtd == typeof(IHandleRequest<,>)
-             let inputType = i.GetGenericArguments()[0]
-             let outputType = i.GetGenericArguments()[1]
-             select new { inputType, outputType, commandType })
-                .GroupBy(x => x.inputType)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.GroupBy(y => y.outputType)
-                        .ToDictionary(
-                            y => y.Key,
-                            y => y.Select(z => z.commandType).ToArray()));
+           
 
             var commandHandlers =
                 (from t in TypeRegistry.Classes
@@ -55,38 +32,30 @@ namespace Applinate
                 .Distinct()
                 .GroupBy(x => (x.inputType, x.outputType), x => x.t);
 
-            ConventionEnforcer.AssertConventions(commandInputs, commands);
+            ConventionEnforcer.AssertConventions();
 
             return RegisterMessageCommands(groups);
         }
 
-        private static bool IsGenerator(Type t)
+  
+        private static NestedDictionary<Type, Type, IRequestHandlerBuilder> RegisterMessageCommands(IEnumerable<IGrouping<(Type inputType, Type outputType), Type>> groups)
         {
-            var q = from i in t.GetInterfaces()
-                    where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandleRequest<,>)
-                    select i;
+            var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder>();
 
-            var result = q.Any();
-            return result;
-        }
-
-        private static NestedDictionary<Type, Type, IRequestHandlerRegistry> RegisterMessageCommands(IEnumerable<IGrouping<(Type inputType, Type outputType), Type>> groups)
-        {
-            var result = new NestedDictionary<Type, Type, IRequestHandlerRegistry>();
             foreach (var handlerGroup in groups)
             {
                 var inputType = handlerGroup.Key.inputType;
                 var outputType = handlerGroup.Key.outputType;
 
-                result.Add(inputType, outputType, new MessageHandlerFactory(inputType, outputType, handlerGroup.First()));
+                result.Add(inputType, outputType, new MessageRequestHandlerBuilder(inputType, outputType, handlerGroup.First()));
             }
 
             return result;
         }
 
-        private class MessageHandlerFactory : IRequestHandlerRegistry
+        private class MessageRequestHandlerBuilder : IRequestHandlerBuilder
         {
-            public MessageHandlerFactory(Type argType, Type resultType, Type implementationType)
+            public MessageRequestHandlerBuilder(Type argType, Type resultType, Type implementationType)
             {
                 ArgType = argType;
                 ResultType = resultType;
@@ -97,7 +66,7 @@ namespace Applinate
             public Type ImplementationType { get; }
             public Type ResultType { get; }
 
-            public IHandleRequest<TArg1, TResult1> GetRequestHandler<TArg1, TResult1>()
+            public IHandleRequest<TArg1, TResult1> BuildRequestHandler<TArg1, TResult1>()
                 where TArg1 : class, IReturn<TResult1>
                 where TResult1 : class, IHaveRequestStatus
             {
@@ -115,12 +84,44 @@ namespace Applinate
             }
         }
 
-        private class ServiceHandlerFactory : IRequestHandlerRegistry
+        private class ServiceRequestHandlerMap<TRequest, TResponse> : IHandleRequest<TRequest, TResponse>
+            where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveRequestStatus
         {
-            IHandleRequest<TArg1, TResult1> IRequestHandlerRegistry.GetRequestHandler<TArg1, TResult1>()
+            public ServiceRequestHandlerMap(Type implementationType, MethodInfo methodInfo)
             {
-                throw new NotImplementedException();
+                ImplementationType = implementationType;
+                MethodInfo = methodInfo;
             }
+
+            public Type ImplementationType { get; }
+            public MethodInfo MethodInfo { get; }
+
+            public Task<TResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default) => 
+                MethodInfo.Invoke(
+                    Activator.CreateInstance(ImplementationType),
+                    new object[]
+                    {
+                        arg,
+                        cancellationToken
+                    }) as Task<TResponse> ?? throw new InvalidCastException();
+        }
+
+        private class ServiceRequestHandlerBuilder : IRequestHandlerBuilder
+        {
+            public ServiceRequestHandlerBuilder(Type implementationType, MethodInfo methodInfo)
+            {
+                ImplementationType = implementationType;
+                MethodInfo = methodInfo;
+            }
+
+            public Type ImplementationType { get; }
+            public MethodInfo MethodInfo { get; }
+
+            public IHandleRequest<TArg1, TResult1> BuildRequestHandler<TArg1, TResult1>()
+                where TArg1 : class, IReturn<TResult1>
+                where TResult1 : class, IHaveRequestStatus => 
+                new ServiceRequestHandlerMap<TArg1, TResult1>(ImplementationType, MethodInfo);
         }
     }
 }

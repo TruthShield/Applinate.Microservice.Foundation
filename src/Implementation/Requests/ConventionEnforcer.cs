@@ -6,10 +6,48 @@ namespace Applinate
 
     internal static class ConventionEnforcer
     {
-        internal static void AssertConventions(
-           Dictionary<Type, ServiceType> commandInputs,
-           Dictionary<Type, Dictionary<Type, Type[]>> commands)
+        private static bool IsGenerator(Type t)
         {
+            var q = from i in t.GetInterfaces()
+                    where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandleRequest<,>)
+                    select i;
+
+            var result = q.Any();
+            return result;
+        }
+
+
+        internal static void AssertConventions()
+        {
+            var commandInputsLookup =
+            (from t in TypeRegistry.Classes
+             let att = t.GetCustomAttribute<ServiceRequestAttribute>(false)
+             where att is not null
+             where !IsGenerator(t)
+             select new { t, att.CommandType })
+             .Distinct()
+             .GroupBy(x => x.t)
+             .ToDictionary(x => x.Key, x => x.ToArray());
+
+            var commandInputs = commandInputsLookup.ToDictionary(x => x.Key, x => x.Value[0].CommandType);
+
+            var commands = // input, output, command (note: should be one)
+            (from commandType in TypeRegistry.Classes
+             from i in commandType.GetInterfaces()
+             where i.IsGenericType
+             let igtd = i.GetGenericTypeDefinition()
+             where igtd == typeof(IHandleRequest<,>)
+             let inputType = i.GetGenericArguments()[0]
+             let outputType = i.GetGenericArguments()[1]
+             select new { inputType, outputType, commandType })
+                .GroupBy(x => x.inputType)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.GroupBy(y => y.outputType)
+                        .ToDictionary(
+                            y => y.Key,
+                            y => y.Select(z => z.commandType).ToArray()));
+
             var errors =
                  GetMissingAttributes(commandInputs)
                  //.Union(GetCommandHandlersWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
