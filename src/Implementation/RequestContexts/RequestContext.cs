@@ -6,7 +6,7 @@ namespace Applinate
     using System.Collections.ObjectModel;
 
     /// <summary>
-    /// Class CommandContext. This class cannot be inherited.
+    /// Class RequestContext. This class cannot be inherited.
     ///
     /// This is the ambient context for the request that holds all the contextual information
     /// about the originating call and execution state.
