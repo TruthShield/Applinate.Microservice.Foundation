@@ -92,7 +92,7 @@ namespace Applinate
                     throw new InvalidOperationException("service type is not correct");
                 }
 
-                var serviceCommandType = serviceAttribute.CommandType;
+                var serviceCommandType = serviceAttribute.ServiceType;
 
                 var methods = typeof(TAbstraction).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 

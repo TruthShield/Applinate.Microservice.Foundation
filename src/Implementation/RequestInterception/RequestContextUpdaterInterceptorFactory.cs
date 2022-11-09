@@ -15,7 +15,7 @@ namespace Applinate.Foundation.Commands.Interceptors
         {
             var currentServiceType = RequestContext.Current.ServiceType;
             var attribute          = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>();
-            var nextServiceType    = attribute?.CommandType ?? ServiceType.None;
+            var nextServiceType    = attribute?.ServiceType ?? ServiceType.None;
 
 
             int nextCallCount = RequestContext.Current.RequestCallCount + 1;

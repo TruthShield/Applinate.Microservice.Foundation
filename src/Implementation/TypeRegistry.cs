@@ -1,5 +1,6 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 
+using Microsoft.Extensions.DependencyModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -11,6 +12,7 @@ namespace Applinate
         private static readonly Lazy<Type[]> _MyInitializers = new Lazy<Type[]>(GetAllInitializers);
         private static readonly Lazy<Type[]> _MyServiceFactories = new Lazy<Type[]>(GetServiceFactories);
         private static readonly Lazy<Type[]> _MyTypes = new Lazy<Type[]>(GetTypes);
+
         private static bool _LoadFromDisk = true;
         public static Type[] Classes => _MyClasses.Value;
 
@@ -42,38 +44,30 @@ namespace Applinate
 
         internal static Type[] ServiceFactories => _MyServiceFactories.Value;
 
-        private static Type[] GetAllInitializers() => 
-            (from x in TypeRegistry.Types
-            where x.IsClass && x.IsAssignableTo(typeof(IInitialize))
-            let ordinal = x.GetCustomAttribute<InitializationPriorityAttribute>()?.Ordinal ?? int.MaxValue
-            orderby ordinal ascending
-            select x)
-            .ToArray();
-
-        private static Type[] GetServiceFactories() =>
-            (from x in TypeRegistry.Types
-             where 
-                x.IsClass && x.IsAssignableTo(typeof(IInstanceRegistry)) &&
-                x != typeof(EmptyInstanceRegistry)
-             select x)
-            .ToArray();
-
         public static Boolean IsNotAnonymousType(Type type)
         {
             var hasCompilerGeneratedAttribute = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
-            var nameContainsAnonymousType     = type.FullName?.Contains("AnonymousType", StringComparison.OrdinalIgnoreCase) ?? false;
-            var isAnonymousType               = hasCompilerGeneratedAttribute && nameContainsAnonymousType;
+            var nameContainsAnonymousType = type.FullName?.Contains("AnonymousType", StringComparison.OrdinalIgnoreCase) ?? false;
+            var isAnonymousType = hasCompilerGeneratedAttribute && nameContainsAnonymousType;
 
             return !isAnonymousType;
         }
 
+        private static Type[] GetAllInitializers() =>
+            (from x in TypeRegistry.Types
+             where x.IsClass && x.IsAssignableTo(typeof(IInitialize))
+             let ordinal = x.GetCustomAttribute<InitializationPriorityAttribute>()?.Ordinal ?? int.MaxValue
+             orderby ordinal ascending
+             select x)
+            .ToArray();
+
         private static Assembly[] GetDirectAssemblies()
         {
-            var returnAssemblies  = new List<Assembly>();
-            var loadedAssemblies  = new HashSet<string>(StringComparer.Ordinal);
+            var returnAssemblies = new List<Assembly>();
+            var loadedAssemblies = new HashSet<string>(StringComparer.Ordinal);
             var assembliesToCheck = new Queue<Assembly>();
-            var runtimeLibraries  = Microsoft.Extensions.DependencyModel.DependencyContext.Default.RuntimeLibraries;
-            
+            var runtimeLibraries = DependencyContext.Default.RuntimeLibraries;
+
             var libs =
                 runtimeLibraries.Where(x => IsServiceAssembly(x.Name)).Select(x => new AssemblyName(x.Name))
                 .Union(
@@ -118,11 +112,20 @@ namespace Applinate
         }
 
         private static Assembly[] GetServiceAssemblies() =>
-            Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll")
-                .Select(x => AssemblyName.GetAssemblyName(x))
-                .Where(IsServiceAssembly)
-                .Distinct()
-                .Select(x => Assembly.Load(x))
+            Directory
+            .GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll")
+            .Select(x => AssemblyName.GetAssemblyName(x))
+            .Where(IsServiceAssembly)
+            .Distinct()
+            .Select(x => Assembly.Load(x))
+            .ToArray();
+
+        private static Type[] GetServiceFactories() =>
+            (from x in TypeRegistry.Types
+            where
+            x.IsClass && x.IsAssignableTo(typeof(IInstanceRegistry)) &&
+            x != typeof(EmptyInstanceRegistry)
+            select x)
                 .ToArray();
 
         private static Type[] GetTypes() =>

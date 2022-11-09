@@ -35,7 +35,7 @@ namespace Applinate
             if (!RequestHandlers.ContainsKey(key1, key2))
             {
                 // fault on execution because the behavior may be overriden by an interceptor
-                return new FaultGeneratingCommandExecutor<TRequest, TResponse>(() =>
+                return new FaultGeneratingRequestExecutor<TRequest, TResponse>(() =>
                     ExceptionFactory.NoDefinedService<TRequest, TResponse>());
             }
 

@@ -18,39 +18,39 @@ namespace Applinate
 
         internal static void AssertConventions()
         {
-            var commandInputsLookup =
+            var requestParamLookup =
             (from t in TypeRegistry.Classes
              let att = t.GetCustomAttribute<ServiceRequestAttribute>(false)
              where att is not null
              where !IsGenerator(t)
-             select new { t, att.CommandType })
+             select new { t, att.ServiceType })
              .Distinct()
              .GroupBy(x => x.t)
              .ToDictionary(x => x.Key, x => x.ToArray());
 
-            var commandInputs = commandInputsLookup.ToDictionary(x => x.Key, x => x.Value[0].CommandType);
+            var requestParams = requestParamLookup.ToDictionary(x => x.Key, x => x.Value[0].ServiceType);
 
-            var commands = // input, output, command (note: should be one)
-            (from commandType in TypeRegistry.Classes
-             from i in commandType.GetInterfaces()
+            var requests = // input, output, request (note: should be one)
+            (from t in TypeRegistry.Classes
+             from i in t.GetInterfaces()
              where i.IsGenericType
              let igtd = i.GetGenericTypeDefinition()
              where igtd == typeof(IRequestHandler<,>)
-             let inputType = i.GetGenericArguments()[0]
-             let outputType = i.GetGenericArguments()[1]
-             select new { inputType, outputType, commandType })
-                .GroupBy(x => x.inputType)
+             let requestType = i.GetGenericArguments()[0]
+             let responseType = i.GetGenericArguments()[1]
+             select new { requestType, responseType, t})
+                .GroupBy(x => x.requestType)
                 .ToDictionary(
                     x => x.Key,
-                    x => x.GroupBy(y => y.outputType)
+                    x => x.GroupBy(y => y.responseType)
                         .ToDictionary(
                             y => y.Key,
-                            y => y.Select(z => z.commandType).ToArray()));
+                            y => y.Select(z => z.t).ToArray()));
 
             var errors =
-                 GetMissingAttributes(commandInputs)
-                 .Union(GetCommandArgsWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
-                 .Union(GetDupeCommandErrors(commands), StringComparer.OrdinalIgnoreCase)
+                 GetMissingAttributes(requestParams)
+                 .Union(GetRequestsWithoutAttributeErrors(requests), StringComparer.OrdinalIgnoreCase)
+                 .Union(GetDupeRequestErrors(requests), StringComparer.OrdinalIgnoreCase)
                  .ToArray();
 
             if (errors.Length == 0)
@@ -63,58 +63,58 @@ namespace Applinate
             throw new InvalidOperationException(errorMessage);
         }
 
-        private static IEnumerable<string> GetCommandArgsWithoutAttributeErrors(Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
-            from command in commands.Keys
-            let att = command.GetCustomAttribute<ServiceRequestAttribute>(false)
-            let bypass = command.GetCustomAttribute<BypassSafetyChecksAttribute>(false)
+        private static IEnumerable<string> GetRequestsWithoutAttributeErrors(Dictionary<Type, Dictionary<Type, Type[]>> requests) =>
+            from request in requests.Keys
+            let att = request.GetCustomAttribute<ServiceRequestAttribute>(false)
+            let bypass = request.GetCustomAttribute<BypassSafetyChecksAttribute>(false)
             where att is null && bypass is not null
             select $@"
-The type {command.Name} is used as input for
-{string.Join(", ", commands[command].Values.SelectMany(x => x.Select(z => $"{z.Name}.ExecuteAsync({command.Name}){{}}")).ToArray())}.
+The type {request.Name} is used as input for
+{string.Join(", ", requests[request].Values.SelectMany(x => x.Select(z => $"{z.Name}.ExecuteAsync({request.Name}){{}}")).ToArray())}.
 
-This requires the command to specify the 
+This requires the request to specify the 
 {typeof(ServiceRequestAttribute)}, which must be 
 {ServiceType.Orchestration}, {ServiceType.Calculation}, {ServiceType.Integration}, or {ServiceType.Tool}.
 
 expecting:
 
 [{typeof(ServiceType)}()]
-class {command.Name}{{...}}
+class {request.Name}{{...}}
 ";
 
-        private static IEnumerable<string> GetCommandHandlerScopeMismatches(Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
-            from x in commands
-            let commandAtt = x.Key.GetCustomAttribute<ServiceRequestAttribute>()
-            let commandType = commandAtt?.CommandType ?? ServiceType.None
+        private static IEnumerable<string> GetCommandHandlerScopeMismatches(Dictionary<Type, Dictionary<Type, Type[]>> requests) =>
+            from x in requests
+            let serviceRequestAttribute = x.Key.GetCustomAttribute<ServiceRequestAttribute>()
+            let requestType = serviceRequestAttribute?.ServiceType ?? ServiceType.None
             from y in x.Value
             from z in y.Value
             let executorAtt = z.GetCustomAttribute<ServiceRequestAttribute>()
-            let executorType = executorAtt?.CommandType ?? ServiceType.None
-            where commandType != executorType
+            let executorType = executorAtt?.ServiceType ?? ServiceType.None
+            where requestType != executorType
             select $@"
 Command scope mismatch: 
-{x.Key.Name} is a command for {commandType} but used in 
+{x.Key.Name} is a command for {requestType} but used in 
 {z.Name} which is an executor for {executorType}.
 
 The command and executors must be for the same scope.
 
 Expecting: 
 
-[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.CommandType)}.{commandType})]
+[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.ServiceType)}.{requestType})]
 class {z.Name}{{...}}
 
 or...
 
-[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.CommandType)}.{executorType})]
+[{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.ServiceType)}.{executorType})]
 class {x.Key.Name}{{...}}
 
 ";
 
-        private static IEnumerable<string> GetDupeCommandErrors(Dictionary<Type, Dictionary<Type, Type[]>> commandsByType) =>
-            from x in commandsByType
+        private static IEnumerable<string> GetDupeRequestErrors(Dictionary<Type, Dictionary<Type, Type[]>> requestsByType) =>
+            from x in requestsByType
             let inputType = x.Key
-            from y in commandsByType[inputType]
-            let outputType = y.Key
+            from y in requestsByType[inputType]
+            let responseType = y.Key
             let executors = GetExecutors(y.Value).ToArray()
             where executors.Skip(1).Any()
             from executor in executors
@@ -131,11 +131,11 @@ Remove {executor.Name} or the other duplicate command definition.
         private static IEnumerable<Type> GetExecutors(Type[] types) =>
             from t in types
             let att = t.GetCustomAttribute<ServiceRequestAttribute>()
-            where att != null && att.CommandType != ServiceType.None
+            where att != null && att.ServiceType != ServiceType.None
             select t;
 
-        private static IEnumerable<string> GetMissingAttributes(Dictionary<Type, ServiceType> commandInputs) =>
-            from x in commandInputs
+        private static IEnumerable<string> GetMissingAttributes(Dictionary<Type, ServiceType> requests) =>
+            from x in requests
             where x.Value == ServiceType.None
             select @$"
 The type {x.Key} is missing the {typeof(ServiceType)} attribute, 
@@ -146,18 +146,18 @@ expecting:
 [{typeof(ServiceType)}()]
 class {x.Key}{{...}}";
 
-        private static IEnumerable<string> GetOrphanedInputErrors(Dictionary<Type, ServiceType> commandInputs, Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
-            from x in commandInputs
+        private static IEnumerable<string> GetOrphanedInputErrors(Dictionary<Type, ServiceType> requests, Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
+            from x in requests
             let keyType = x.Key
             where !commands.ContainsKey(keyType)
             select $@"
 Type: {keyType} 
 Assembly: '{keyType.Assembly.GetName().Name}' 
 Error: the type has a [{nameof(ServiceRequestAttribute)}({typeof(ServiceType)})] attribute, 
-but is not defined in any command executor.
+but is not defined in any request executor.
 
 Either remove {keyType} or create a {typeof(IRequestHandler<,>).Name} 
-that takes a command of type {keyType}.
+that takes a request of type {keyType}.
 ";
 
     }

@@ -47,7 +47,7 @@ namespace Applinate
 
         private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildMessageCommanHandlers()
         {
-            var commandHandlers =
+            var requestHandlers =
                 (from t in TypeRegistry.Classes
                  from i in t.GetInterfaces()
                  where i.IsGenericType
@@ -59,7 +59,7 @@ namespace Applinate
 
                  .ToArray();
 
-            var groups = commandHandlers
+            var groups = requestHandlers
                 .Distinct()
                 .GroupBy(x => (x.inputType, x.outputType), x => x.t);
 

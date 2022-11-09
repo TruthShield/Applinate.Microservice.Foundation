@@ -19,7 +19,7 @@ namespace Applinate
     /// // Step 2: Start the conversation
     /// c.StartNewConversation();
     /// 
-    /// // Step 3: Execute the command
+    /// // Step 3: Execute the request
     /// var result = await new ContentConfigurationQuery().ExecuteAsync();
     /// </example>
     public sealed class ServiceClient

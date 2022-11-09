@@ -6,24 +6,24 @@ namespace Applinate
     {
         public RequestContextChange(
             RequestContextChangeType changeType, 
-            Type commandType, 
-            Type returnType, 
+            Type requestType, 
+            Type responseType, 
             int serviceCallCount)
         {
             ContextChangeType = changeType;
-            CommandType       = commandType;
-            ReturnType        = returnType;
+            RequestType       = requestType;
+            ResponseType      = responseType;
             ServiceCallCount  = serviceCallCount;
         }
 
         public RequestContextChangeType ContextChangeType { get; }
-        public Type CommandType { get; }
-        public Type ReturnType { get; }
+        public Type RequestType { get; }
+        public Type ResponseType { get; }
         public int ServiceCallCount { get; }
 
         public override string ToString()
         {
-            return $@"{ContextChangeType} {ServiceCallCount} {CommandType}";
+            return $@"{ContextChangeType} {ServiceCallCount} {RequestType}";
         }
 
         public static RequestContextChange Entry<TRequest, TResponse>(int serviceCallCount)

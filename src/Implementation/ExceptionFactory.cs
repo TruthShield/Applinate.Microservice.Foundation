@@ -39,15 +39,15 @@ new ServiceClient(UserProfileId, AppContextKeys.MyAppContext);
 ");
 
         public static Exception InvalidCallingContext(
-            ServiceType currentCommandType,
-            ServiceType commandType,
+            ServiceType currentRequestType,
+            ServiceType requestType,
             string accepted) =>
             new InvalidOperationException(@$"
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-The current calling service context is {currentCommandType} and the
-target command is {commandType}.
+The current calling service context is {currentRequestType} and the
+target request is {requestType}.
 
-Only exection of {accepted} services are allowed from {commandType} services.
+Only exection of {accepted} services are allowed from {requestType} services.
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ");
 
@@ -162,10 +162,10 @@ internal sealed class MyLazyInitializer : IInitialize
         public static Exception NoDefinedService<TRequest, TResponse>() =>
             new InvalidOperationException($@"
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-no handler is defined for executing a command 
-for type {typeof(TRequest).GetFriendlyName(true)}:IReturn<{typeof(TResponse).GetFriendlyName(true)}>{{}}.
+no handler is defined for executing a request 
+of type {typeof(TRequest).GetFriendlyName(true)}:IReturn<{typeof(TResponse).GetFriendlyName(true)}>{{}}.
 
-You need to define a handler for the command that resides
+You need to define a handler for the request that resides
 in the same directory as the other assemblies (*.dll files).
 
 For your implementation to be discovered, your assembly name MUST follow Applinate conventions:

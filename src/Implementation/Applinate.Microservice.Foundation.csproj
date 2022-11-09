@@ -103,7 +103,7 @@ Try building with Applinate today. You'll extend your product's life, prevent ex
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
-	  <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
     <PackageReference Include="Polly" Version="7.2.3" />
   </ItemGroup>

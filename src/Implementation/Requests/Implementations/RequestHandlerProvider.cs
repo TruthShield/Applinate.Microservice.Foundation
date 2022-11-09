@@ -17,26 +17,26 @@ namespace Applinate
         /// when possible to avoid unnessasry blocking.
         /// </summary>
         /// <typeparam name="TResponse">The type of the t result.</typeparam>
-        /// <param name="command">The command.</param>
+        /// <param name="request">The request.</param>
         /// <returns>TResponse.</returns>
         [DebuggerStepThrough, DebuggerHidden]
         public static TResponse Execute<TResponse>(
-            this IReturn<TResponse> command)
+            this IReturn<TResponse> request)
             where TResponse : class, IHaveResponseStatus =>
-            AsyncHelper.RunSync<TResponse>(() => ExecuteAsync<TResponse>(command));
+            AsyncHelper.RunSync<TResponse>(() => ExecuteAsync<TResponse>(request));
 
         /// <summary>
         /// Executes the specified command asynchronously.
         /// </summary>
         /// <typeparam name="TResponse">The type of the t result.</typeparam>
-        /// <param name="command">The command.</param>
+        /// <param name="request">The request.</param>
         /// <param name="cancellationToken">
         /// The cancellation token that can be used by other objects or
         /// threads to receive notice of cancellation.</param>
         /// <returns>Task&lt;TResponse&gt;.</returns>
         [DebuggerStepThrough, DebuggerHidden]
         public static Task<TResponse> ExecuteAsync<TResponse>(
-            this IReturn<TResponse> command,
+            this IReturn<TResponse> request,
             CancellationToken cancellationToken = default)
             where TResponse : class, IHaveResponseStatus
         {
@@ -44,11 +44,11 @@ namespace Applinate
                 .WaitAndRetry(new[] { TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(200) })
                 .Execute(() =>
                 {
-                    var t = command.GetType();
+                    var t = request.GetType();
 
                     var mi = typeof(RequestHandlerProvider).GetMethod(nameof(InternalExecuteAsync), BindingFlags.Static | BindingFlags.NonPublic);
-                    var mi2 = mi?.MakeGenericMethod(command.GetType(), typeof(TResponse));
-                    var result = mi2?.Invoke(null, new object[] { command, cancellationToken });
+                    var mi2 = mi?.MakeGenericMethod(request.GetType(), typeof(TResponse));
+                    var result = mi2?.Invoke(null, new object[] { request, cancellationToken });
 
                     return result as Task<TResponse> ?? Task.FromResult<TResponse>(default);
                 });

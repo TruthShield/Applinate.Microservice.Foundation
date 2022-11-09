@@ -75,13 +75,13 @@ namespace Applinate.Test
             }
 
             _Executor.Value.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
-            // TODO: set commandhelper
+            // TODO: set requesthelper
         }
 
         public static void SetGlobally(Func<TRequest, TResponse> behavior)
         {
             _GlobalExecutor.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
-            // TODO: set commandhelper
+            // TODO: set requesthelper
         }
 
         internal static Task<TResponse> Execute(TRequest request, CancellationToken cancellationToken)

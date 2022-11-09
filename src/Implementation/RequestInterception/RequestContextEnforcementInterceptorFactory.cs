@@ -34,9 +34,9 @@ namespace Applinate.Foundation.Commands.Interceptors
                 throw ExceptionFactory.CommandContextUnknown();
             }
 
-            var commandType = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>()?.CommandType ?? ServiceType.None;
+            var requestType = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>()?.ServiceType ?? ServiceType.None;
 
-            if (_Allowed[currentServiceType].Contains(commandType))
+            if (_Allowed[currentServiceType].Contains(requestType))
             {
                 return next(request, cancellationToken);
             }
@@ -44,7 +44,7 @@ namespace Applinate.Foundation.Commands.Interceptors
             var accepted = string.Join(", ", _Allowed[currentServiceType].Select(x => x.ToString()).ToArray());
 
 
-            throw ExceptionFactory.InvalidCallingContext(currentServiceType, commandType, accepted);
+            throw ExceptionFactory.InvalidCallingContext(currentServiceType, requestType, accepted);
         }
 
 
