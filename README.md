@@ -26,11 +26,11 @@ Want a framework for building top-quality software that's easy to scale, maintai
 
 [Applinate](https://applinate.com) is [Truth Shield](https://truthshield.io)'s microservice toolset used on all our projects.  And, I hope it helps you avoid many of the typical technical challenges in software production today.
 
-Let me ask you: Doesn’t it make sense to isolate what you know will change, so you can swap out parts of your system without throwing out the baby with the bathwater?
+And when you stop to think about it, doesn’t it make sense to isolate what you know will change, so you can swap out parts of your system without throwing out the baby with the bathwater?
 
 This is where `Applinate` shines.
 
-Using Applinate, your team has proven guidelies to produce sustainable, scalable, and high-quality distributed microservices.  You can use Applinate today to extend your project or quickly build something new.
+Using Applinate, your team has proven guidelines to produce sustainable, scalable, and high-quality distributed microservices.  You can use Applinate today to extend your project or quickly build something new.
 - Establish guardrails for building agile software. Everyone knows technology and business move at different rates.  Applinate helps you isolate changes between things that change independently so your product can evolve, which significantly extends the life of your code base (and may save your company).
 - Construct your system on a bedrock of proven architectural patterns. Applinate leverages decades of knowledge, experience, and best practices from seasoned software architects. This way, your teams bypass unnecessary learning curves and mistakes, helping you avoid severe headaches (or worse) down the road.
 - Boost your teams’ productivity. Applinate gives you tools for encryption, compression, distributed messaging (CQRS/PubSub), caching, logging, and more, so you don’t waste time reinventing the wheel.
