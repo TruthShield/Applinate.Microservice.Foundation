@@ -9,7 +9,7 @@ namespace Applinate
         where TArg : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
     {
-        private static readonly object _SyncLock = new object();
+        private static readonly object _SyncLock = new();
 
         private static InterceptorRecord<TArg, TResult>[]? _ProxyTypes;
 

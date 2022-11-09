@@ -330,7 +330,7 @@ class Build : NukeBuild
 [PublicAPI]
 public interface IWithGitVersion : INukeBuild
 {
-    [GitVersion(Framework = "net6.0", NoFetch = true)]
+    [GitVersion(Framework = "net7.0", NoFetch = true)]
     [Required]
     GitVersion Versioning => TryGetValue(() => Versioning);
 }
