@@ -2,7 +2,7 @@
 
 namespace Applinate
 {
-    public delegate Task<TResult?> ExecuteDelegate<TArg, TResult>(
+    public delegate Task<TResult> ExecuteDelegate<TArg, TResult>(
             TArg arg,
             CancellationToken cancellationToken)
         where TArg : class, IReturn<TResult>

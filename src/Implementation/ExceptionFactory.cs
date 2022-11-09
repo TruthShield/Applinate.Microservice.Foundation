@@ -21,7 +21,7 @@ namespace Applinate
                 { typeof(ushort) , "ushort"  },
                 { typeof(uint)   , "uint"    },
                 { typeof(ulong)  , "ulong"   },
-                { typeof(void)   , "void"    }
+                { typeof(void)   , "void"    },
             };
 
         public static Exception CommandContextUnknown() => new InvalidOperationException($@"
@@ -119,11 +119,11 @@ internal sealed class MyLazyInitializer : IInitialize
                 return friendlyName;
             }
 
-            friendlyName = includeNamespace? type.FullName : type.Name;
+            friendlyName = (includeNamespace? type.FullName : type.Name) ?? throw ExceptionFactory.UnexpectedNull();
 
             if (type.IsGenericType)
             {
-                int backtick = friendlyName.IndexOf('`');
+                int backtick = friendlyName.IndexOf('`', StringComparison.OrdinalIgnoreCase);
 
                 if (backtick > 0)
                 {
@@ -148,8 +148,11 @@ internal sealed class MyLazyInitializer : IInitialize
                 return type.GetElementType().GetFriendlyName() + "[]";
             }
 
-            return friendlyName;
+            return friendlyName ?? throw UnexpectedNull();
         }
+
+        public static Exception UnexpectedNull() => new InvalidOperationException("unexpected null");
+
 
         public static Exception NoDefinedService<TArg, TResult>() =>
             new InvalidOperationException($@"
@@ -161,7 +164,7 @@ You need to define a handler for the command that resides
 in the same directory as the other assemblies (*.dll files).
 
 -----------------------------------------------------------------------------------
-[{typeof(ServiceAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
+[{typeof(ServiceRequestAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
 internal class MyHandler : IExecuteCommand<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 
@@ -182,7 +185,7 @@ If you are in unit tests and need to mock you have two options:
 assembly or an assembly directly referenced by your test assembly with the signature:
 
 -----------------------------------------------------------------------------------
-[{typeof(ServiceAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
+[{typeof(ServiceRequestAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
 internal class MyEmulator : IExecuteCommand<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 

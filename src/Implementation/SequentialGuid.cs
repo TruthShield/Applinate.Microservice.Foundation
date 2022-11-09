@@ -139,7 +139,7 @@ namespace Applinate
                 return false;
             }
 
-            if (!(obj is SequentialGuid))
+            if (obj is not SequentialGuid)
             {
                 return false;
             }

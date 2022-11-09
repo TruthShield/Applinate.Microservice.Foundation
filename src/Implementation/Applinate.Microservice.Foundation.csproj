@@ -3,6 +3,7 @@
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <TargetFrameworks>net6.0</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
 	<Version>0.0.1</Version>
 	<Authors>Truth Shield</Authors>
@@ -61,8 +62,7 @@ With Applinate, you build on top of scalable, flexible, and proven microservice 
 Testing, maintenance, and product evolution are simplified using Applinate.
 
 Try building with Applinate today. You'll extend your product's life, prevent expensive rebuilds, and add rocket fuel to your teams productivity. 
-
-	</Description>
+  </Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

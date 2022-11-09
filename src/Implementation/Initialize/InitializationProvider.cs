@@ -26,13 +26,13 @@ namespace Applinate
                 Applinate.RequestContext.Current = Applinate.RequestContext.Current with { ServiceType = ServiceType.Orchestration };
 
                 var services = ServiceProvider.ServiceCollection;
-                ServiceProvider.RegisterSingleton<IRequestHandler, DefaultRequestExecutor>();
+                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
 
                 ExecuteFoundInitializers(services, testing);
 
                 WireUpEventListeners();
 
-                ServiceProvider.RegisterSingleton<IRequestHandler, DefaultRequestExecutor>();
+                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
 
                 initialized = true;
                 
@@ -45,7 +45,7 @@ namespace Applinate
 
         private static void ExecuteFoundInitializers(IServiceCollection services, bool testing)
         {
-            var q = from x in TypeRegistry.GetTypes()
+            var q = from x in TypeRegistry.Types
                     where x.IsClass && x.IsAssignableTo(typeof(IInitialize))
                     let ordinal = x.GetCustomAttribute<InitializationPriorityAttribute>()?.Ordinal ?? int.MaxValue
                     orderby ordinal 

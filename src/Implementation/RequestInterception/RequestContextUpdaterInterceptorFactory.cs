@@ -14,7 +14,7 @@ namespace Applinate.Foundation.Commands.Interceptors
             CancellationToken cancellationToken) 
         {
             var currentServiceType = RequestContext.Current.ServiceType;
-            var attribute          = typeof(TArg).GetCustomAttribute<ServiceAttribute>();
+            var attribute          = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>();
             var nextServiceType    = attribute?.CommandType ?? ServiceType.None;
 
 
@@ -37,7 +37,7 @@ namespace Applinate.Foundation.Commands.Interceptors
                         RequestContext.Current.RequestCallCount));
 
                 var result = await base.ExecuteAsync(next, arg, cancellationToken).ConfigureAwait(false);
-                return result;
+                return result ?? throw ExceptionFactory.UnexpectedNull();
             }
             catch
             {

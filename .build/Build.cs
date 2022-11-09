@@ -52,6 +52,8 @@ using JetBrains.Annotations;
     InvokedTargets = new[] { nameof(Pipeline) })]
 class Build : NukeBuild
 {
+    static string Version = new Version(0, 2, 0).ToString();
+
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider
@@ -69,7 +71,6 @@ class Build : NukeBuild
     [Solution(GenerateProjects = true)]
     readonly Solution Solution;
 
-    static string Version = new Version(0, 1, 2).ToString();
 
     const string MasterBranch = "master";
     const string DevelopBranch = "develop";

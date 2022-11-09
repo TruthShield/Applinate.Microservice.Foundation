@@ -34,7 +34,7 @@ namespace Applinate.Foundation.Commands.Interceptors
                 throw ExceptionFactory.CommandContextUnknown();
             }
 
-            var commandType = typeof(TArg).GetCustomAttribute<ServiceAttribute>()?.CommandType ?? ServiceType.None;
+            var commandType = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>()?.CommandType ?? ServiceType.None;
 
             if (_Allowed[currentServiceType].Contains(commandType))
             {

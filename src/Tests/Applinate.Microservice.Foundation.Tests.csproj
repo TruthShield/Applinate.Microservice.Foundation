@@ -1,17 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
 	<Version>0.0.1</Version>
 	<Authors>Matt Cochran</Authors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="MyInterceptor_002.cs" />
-    <Compile Remove="MyInterceptor_003.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AsyncFixer" Version="1.6.0">
