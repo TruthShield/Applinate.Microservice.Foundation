@@ -163,9 +163,14 @@ for type {typeof(TArg).GetFriendlyName(true)}:IReturns<{typeof(TResult).GetFrien
 You need to define a handler for the command that resides
 in the same directory as the other assemblies (*.dll files).
 
+The assembly name MUST follow this convention
+* the orchestration service assembly name must be ""*.Orchestrate.*""
+* the calculation service assembly name must be ""*.Calculate.*""
+* the integration service assembly name must be ""*.Integrate.*""
+
 -----------------------------------------------------------------------------------
-[{typeof(ServiceRequestAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
-internal class MyHandler : IExecuteCommand<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
+
+internal class MyHandler : IRequestHandler<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 
     public Task<{typeof(TResult).GetFriendlyName()}> ExecuteAsync(
@@ -185,8 +190,7 @@ If you are in unit tests and need to mock you have two options:
 assembly or an assembly directly referenced by your test assembly with the signature:
 
 -----------------------------------------------------------------------------------
-[{typeof(ServiceRequestAttribute).GetFriendlyName()}({typeof(ServiceType).GetFriendlyName()}.{nameof(ServiceType.Orchestration)})]
-internal class MyEmulator : IExecuteCommand<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
+internal class MyEmulator : IRequestHandler<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 
     public Task<{typeof(TResult).GetFriendlyName()}> ExecuteAsync(

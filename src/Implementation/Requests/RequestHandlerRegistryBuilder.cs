@@ -2,7 +2,6 @@
 
 namespace Applinate
 {
-    using Microsoft.EntityFrameworkCore.Metadata.Conventions;
     using Polly.Caching;
     using System.ComponentModel;
     using System.Reflection;

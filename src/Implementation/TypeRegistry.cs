@@ -6,10 +6,11 @@ using System.Runtime.CompilerServices;
 
 namespace Applinate
 {
-    [DebuggerStepThrough]
     public static class TypeRegistry
     {
         private static readonly Lazy<Type[]> _MyClasses = new Lazy<Type[]>(() => Types.Where(x => x.IsClass).ToArray());
+        private static readonly Lazy<Type[]> _MyInitializers = new Lazy<Type[]>(GetAllInitializers);
+        private static readonly Lazy<Type[]> _MyServiceFactories = new Lazy<Type[]>(GetServiceFactories);
         private static readonly Lazy<Type[]> _MyTypes = new Lazy<Type[]>(GetTypes);
         private static bool _LoadFromDisk = true;
         public static Type[] Classes => _MyClasses.Value;
@@ -37,6 +38,26 @@ namespace Applinate
         }
 
         public static Type[] Types => _MyTypes.Value;
+
+        internal static Type[] Initializers => _MyInitializers.Value;
+
+        internal static Type[] ServiceFactories => _MyServiceFactories.Value;
+
+        private static Type[] GetAllInitializers() => 
+            (from x in TypeRegistry.Types
+            where x.IsClass && x.IsAssignableTo(typeof(IInitialize))
+            let ordinal = x.GetCustomAttribute<InitializationPriorityAttribute>()?.Ordinal ?? int.MaxValue
+            orderby ordinal ascending
+            select x)
+            .ToArray();
+
+        private static Type[] GetServiceFactories() =>
+            (from x in TypeRegistry.Types
+             where 
+                x.IsClass && x.IsAssignableTo(typeof(IInstanceRegistry)) &&
+                x != typeof(EmptyInstanceRegistry)
+             select x)
+            .ToArray();
 
         public static Boolean IsNotAnonymousType(Type type)
         {
@@ -106,7 +127,7 @@ namespace Applinate
                 .ToArray();
 
         private static Type[] GetTypes() =>
-                                    (_LoadFromDisk ? GetServiceAssemblies() : GetDirectAssemblies())
+           (_LoadFromDisk ? GetServiceAssemblies() : GetDirectAssemblies())
             .SelectMany(x => x.GetTypes()).Where(IsNotAnonymousType)
             .Distinct()
             .ToArray();
@@ -115,9 +136,12 @@ namespace Applinate
             IsServiceAssembly(a?.Name ?? String.Empty);
 
         private static bool IsServiceAssembly(string name) =>
-            name.IndexOf(".Integrate.", StringComparison.OrdinalIgnoreCase) >= 0 ||
             name.IndexOf("Applinate", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf(".Integrate.", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf(".Integration.", StringComparison.OrdinalIgnoreCase) >= 0 ||
             name.IndexOf(".Calculate.", StringComparison.OrdinalIgnoreCase) >= 0 ||
-            name.IndexOf(".Orchestrate.", StringComparison.OrdinalIgnoreCase) >= 0;
+            name.IndexOf(".Calculation.", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf(".Orchestrate.", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf(".Orchestration.", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

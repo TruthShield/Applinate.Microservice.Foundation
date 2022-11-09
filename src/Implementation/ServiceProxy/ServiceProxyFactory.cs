@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
-    using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
 
     internal class ServiceProxyFactory:IInitialize
@@ -10,14 +9,14 @@ namespace Applinate
 
         private static bool _Initialized = false;
 
-        internal static T Build<T>() => 
-            ServiceProxy<T>.Generate();
+        internal static TAbstraction Build<TAbstraction>() => 
+            ServiceProxy<TAbstraction>.Generate();
 
-        internal static void Register<T>() where T:class =>
-            ServiceProvider.RegisterSingleton<T>(x => Build<T>()) ;
+        internal static void Register<TAbstraction>() where TAbstraction:class =>
+            ServiceProvider.RegisterSingleton<TAbstraction>(() => Build<TAbstraction>()) ;
 
         [STAThread]
-        public void Initialize(IServiceCollection services, bool testing = false)
+        public void Initialize(bool testing = false)
         {
             if(_Initialized)
             {

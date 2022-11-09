@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Ioc\Applinate.Microservice.InversionOfControl.Microsoft.csproj" />
     <ProjectReference Include="..\Implementation\Applinate.Microservice.Foundation.csproj" />
   </ItemGroup>
 

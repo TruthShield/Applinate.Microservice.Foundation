@@ -1,7 +1,6 @@
 // Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    [ServiceRequest(ServiceType.Integration)]
     public class My_006_UnitTestIntegratorCommandExecutor : IRequestHandler<My_006_UnitTestIntegratorCommand, My_006_UnitTestIntegratorCommandResult>
     {
         public Task<My_006_UnitTestIntegratorCommandResult> ExecuteAsync(

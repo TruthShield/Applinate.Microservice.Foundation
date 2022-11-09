@@ -16,7 +16,6 @@ namespace Applinate
             return result;
         }
 
-
         internal static void AssertConventions()
         {
             var commandInputsLookup =
@@ -50,9 +49,7 @@ namespace Applinate
 
             var errors =
                  GetMissingAttributes(commandInputs)
-                 //.Union(GetCommandHandlersWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
                  .Union(GetCommandArgsWithoutAttributeErrors(commands), StringComparer.OrdinalIgnoreCase)
-                 //.Union(GetCommandHandlerScopeMismatches(commands), StringComparer.OrdinalIgnoreCase)
                  .Union(GetDupeCommandErrors(commands), StringComparer.OrdinalIgnoreCase)
                  .ToArray();
 
@@ -110,27 +107,6 @@ or...
 
 [{typeof(ServiceRequestAttribute)}({nameof(ServiceRequestAttribute.CommandType)}.{executorType})]
 class {x.Key.Name}{{...}}
-
-";
-
-        private static IEnumerable<string> GetCommandHandlersWithoutAttributeErrors(Dictionary<Type, Dictionary<Type, Type[]>> commands) =>
-            from x in commands
-            from y in x.Value
-            from z in y.Value
-            let att = z.GetCustomAttribute<ServiceRequestAttribute>()
-            let att2 = z.GetCustomAttribute<BypassSafetyChecksAttribute>()
-            where att is null && att2 is null
-            select $@"
-The type {z.Name} is a command executor.
-
-This requires the class to specify the 
-{typeof(ServiceRequestAttribute)}, which must be 
-{ServiceType.Orchestration}, {ServiceType.Calculation}, {ServiceType.Integration}, or {ServiceType.Tool}.
-
-expecting:
-
-[{typeof(ServiceRequestAttribute)}()]
-class {z.Name}{{...}}
 
 ";
 

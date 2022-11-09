@@ -5,9 +5,6 @@ namespace Applinate
 {
     public static class ServiceProvider
     {
-        public static IServiceProvider Provider =>
-            ServiceCollection.BuildServiceProvider();
-
         public static IServiceCollection ServiceCollection { get; private set; } = new ServiceCollection(); // UNDONE: not thread safe
 
         /// <summary>
@@ -20,7 +17,7 @@ namespace Applinate
         /// <exception cref="System.InvalidOperationException">no service has been registered for type {typeof(TService)}, add this by calling ServiceLocator.Register<TService,TImplementation>()")</exception>
         public static TService Locate<TService>(TService? fallback = default)
         {
-            var result = Provider.GetService<TService>();
+            var result = InstanceRegistry.GetInstance<TService>();
 
             if (result is null)
             {
@@ -35,25 +32,28 @@ namespace Applinate
             return result;
         }
 
-        public static void RegisterSingleton<TService, TImplementation>()
-            where TService : class where TImplementation : class, TService =>
-            ServiceCollection.AddSingleton<TService, TImplementation>();
+        public static void RegisterSingleton<TAbstraction, TConcretion>()
+            where TAbstraction : class where TConcretion : class, TAbstraction =>
+            InstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>();
 
-        public static void RegisterSingleton<TService>(Func<IServiceProvider, TService> implementationFactory)
-            where TService : class =>
-            ServiceCollection.AddSingleton<TService>(implementationFactory);
+        [Obsolete]
+        public static void RegisterSingleton<TAbstraction>(Func<TAbstraction> implementationFactory)
+            where TAbstraction : class =>
+            InstanceRegistry.RegisterSingleton<TAbstraction>(implementationFactory);
 
-        public static void RegisterSingleton<TService, TImplementation>(TImplementation implementation)
-            where TService : class where TImplementation : class, TService =>
-            ServiceCollection.AddSingleton<TService, TImplementation>(s => implementation);
+        public static void RegisterSingleton<TAbstraction, TConcretion>(TConcretion implementation)
+            where TAbstraction : class where TConcretion : class, TAbstraction =>
+            InstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>(s => implementation);
 
-        public static void RegisterTransient<TService>(Func<IServiceProvider, TService> implementationFactory)
-            where TService : class =>
-            ServiceCollection.AddTransient<TService>(implementationFactory);
+        [Obsolete]
+        public static void RegisterTransient<TAbstraction>(Func<TAbstraction> implementationFactory)
+            where TAbstraction : class =>
+            InstanceRegistry.RegisterTransient<TAbstraction>(implementationFactory);
 
-        public static void RegisterTransient<TService, TImplementation>()
-            where TService : class where TImplementation : class, TService, new() =>
-            RegisterTransient<TService>(svc => new TImplementation());
+        [Obsolete]
+        public static void RegisterTransient<TAbstraction, TConcretion>()
+            where TAbstraction : class where TConcretion : class, TAbstraction, new() =>
+            RegisterTransient<TAbstraction>(() => new TConcretion());
 
         public static void SetServiceCollection(IServiceCollection services) =>
             ServiceCollection = services;

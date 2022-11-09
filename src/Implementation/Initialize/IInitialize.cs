@@ -2,10 +2,8 @@
 
 namespace Applinate
 {
-    using Microsoft.Extensions.DependencyInjection;
-
     /// <summary>
-    /// Interface ILazyAppInitializer
+    /// Interface IInitialize
     /// </summary>
     /// <remarks>
     /// any class implementing this interface will be called when the utility
@@ -14,6 +12,6 @@ namespace Applinate
     public interface IInitialize // TODO: document in readme
     {
         bool SkipDuringTesting { get; }
-        void Initialize(IServiceCollection services, bool testing = false);
+        void Initialize(bool testing = false);
     }
 }
