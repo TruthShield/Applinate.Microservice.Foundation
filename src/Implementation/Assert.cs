@@ -42,6 +42,7 @@ namespace Applinate
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void IsNotNullOrEmpty<T>(IEnumerable<T> parameter, string parameterName)
         {
             Assert.IsNotNull(parameter, parameterName);
@@ -50,6 +51,35 @@ namespace Applinate
             {
                 throw new ArgumentOutOfRangeException(parameterName + " must have at least one item.");
             }    
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void IsInterface(Type interfaceType, string parameterName)
+        {
+            Assert.IsNotNull(interfaceType, parameterName);
+
+            if(!interfaceType.IsInterface)
+            {
+                throw new ArgumentException(parameterName + " must be an interface", parameterName);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void IsInterface<TAbstraction>() where TAbstraction : class
+        {
+            if(! typeof(TAbstraction).IsInterface)
+            {
+                throw new ArgumentException($"the generic type {typeof(TAbstraction)} must be an interface");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void IsNotUndefined(InstanceLifetime lifetime, string parameterName)
+        {
+            if(lifetime == InstanceLifetime.Undefined)
+            {
+                throw new ArgumentException($"the lifetime must be specified. {nameof(InstanceLifetime)}.{nameof(InstanceLifetime.Undefined)} is not valid for this operation.", parameterName);
+            }
         }
     }
 }

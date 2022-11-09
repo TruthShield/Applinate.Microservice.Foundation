@@ -11,7 +11,7 @@ namespace Applinate
 
         internal static void Register<TAbstraction>()
             where TAbstraction:class =>
-            ServiceProvider.RegisterInstance(
+            ServiceProvider.Register(
                 ServiceProxy<TAbstraction>.Generate,
                 InstanceLifetime.Singleton);
 

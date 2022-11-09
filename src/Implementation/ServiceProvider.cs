@@ -16,29 +16,19 @@ namespace Applinate
         {
             var result = InstanceRegistry.GetInstance<TService>();
 
-            if (result is null)
-            {
-                if (fallback is null)
-                {
-                    throw ExceptionFactory.NoRegisteredService<TService>();
-                }
-
-                return fallback;
-            }
-
-            return result;
+            return result is null ? fallback is null ? throw ExceptionFactory.NoRegisteredService<TService>() : fallback : result;
         }
 
-        public static void RegisterInstance<TAbstraction>(
+        public static void Register<TAbstraction>(
             Func<TAbstraction> factory, 
             InstanceLifetime lifetime = InstanceLifetime.Transient)
             where TAbstraction : class =>
             InstanceRegistry.RegisterInstance(factory, lifetime);
 
-        internal static void RegisterInstance<TAbstraction, TConcretion>(
+        internal static void Register<TAbstraction, TConcretion>(
             InstanceLifetime lifetime = InstanceLifetime.Transient)
             where TConcretion : TAbstraction, new()
             where TAbstraction: class =>
-            RegisterInstance<TAbstraction>(() => new TConcretion(), lifetime);
+            Register<TAbstraction>(() => new TConcretion(), lifetime);
     }
 }

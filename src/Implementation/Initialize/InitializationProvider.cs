@@ -28,7 +28,7 @@ namespace Applinate
 
                 WireUpEventListeners();
 
-                ServiceProvider.RegisterInstance<IRequestExecutor, RequestExecutor>(InstanceLifetime.Singleton);
+                ServiceProvider.Register<IRequestExecutor, RequestExecutor>(InstanceLifetime.Singleton);
 
                 initialized = true;
                 
