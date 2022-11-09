@@ -7,15 +7,29 @@ namespace Applinate
     {
         private static IServiceProvider Provider => ServiceCollection.BuildServiceProvider();
 
-        private static IServiceCollection ServiceCollection { get; } = new ServiceCollection(); // UNDONE: not thread safe
+        private static IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
-        void IInstanceRegistry.RegisterSingleton<TAbstraction>(Func<TAbstraction> factory) =>
-            ServiceCollection.AddSingleton(sp => factory());
-
-        void IInstanceRegistry.RegisterTransient<TAbstraction>(Func<TAbstraction> factory) =>
-            ServiceCollection.AddTransient(sp => factory());
-
-        object? IInstanceRegistry.GetInstance(Type serviceType) => 
+        object? IInstanceRegistry.Get(Type serviceType) => 
             Provider.GetService(serviceType);
+
+        void IInstanceRegistry.Register<TAbstraction>(
+            Func<TAbstraction> factory, 
+            InstanceLifetime lifetime = InstanceLifetime.Transient)
+        {
+            switch(lifetime)
+            {
+                case InstanceLifetime.Undefined:
+                    throw new InvalidOperationException($"The {nameof(InstanceLifetime)} is {nameof(InstanceLifetime.Undefined)}.  You must defin the instance lifetime.");
+                case InstanceLifetime.Singleton:
+                    ServiceCollection.AddSingleton(sp => factory());
+                    break;
+                case InstanceLifetime.Transient:
+                    ServiceCollection.AddTransient(sp => factory());
+                    break;
+                default:
+                    throw new NotSupportedException($"{nameof(InstanceLifetime)}.{nameof(InstanceLifetime.Undefined)} is not supported");
+
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace Applinate.Foundation.Test
         [Fact(DisplayName = "When a registered service provider is requested the service registry shall return the registered provider.")]
         public void Rgistration_Works()
         {
-            ServiceProvider.RegisterSingleton<IRegistrationTestService, RegistrationTestService>();
+            ServiceProvider.RegisterInstance<IRegistrationTestService, RegistrationTestService>(InstanceLifetime.Singleton);
 
             var service = ServiceProvider.Locate<IRegistrationTestService>();
 

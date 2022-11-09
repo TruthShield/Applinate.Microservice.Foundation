@@ -1,8 +1,6 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 
-using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace Applinate
 {    
@@ -16,26 +14,21 @@ namespace Applinate
         {
             try
             {
-
                 if (initialized)
                 {
                     return;
                 }
 
-                // TDOO: remove internals visible to and factor the code to move the appropriate functionality to the right places (the code below is too tightly coupled to Applinate internals)
+                // TDOO: look into removing internals visible to and factor the code to move the appropriate functionality to the right places (the code below is too tightly coupled to Applinate internals)
                 Applinate.RequestContext.Current = Applinate.RequestContext.Current with { ServiceType = ServiceType.Orchestration };
 
                 RegisterServiceFactories();
-
-                var services = ServiceProvider.ServiceCollection;
-
-                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
 
                 ExecuteInitializers(testing);
 
                 WireUpEventListeners();
 
-                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
+                ServiceProvider.RegisterInstance<IRequestExecutor, RequestExecutor>(InstanceLifetime.Singleton);
 
                 initialized = true;
                 

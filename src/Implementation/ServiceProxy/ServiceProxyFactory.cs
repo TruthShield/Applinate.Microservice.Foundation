@@ -9,11 +9,11 @@ namespace Applinate
 
         private static bool _Initialized = false;
 
-        internal static TAbstraction Build<TAbstraction>() => 
-            ServiceProxy<TAbstraction>.Generate();
-
-        internal static void Register<TAbstraction>() where TAbstraction:class =>
-            ServiceProvider.RegisterSingleton<TAbstraction>(() => Build<TAbstraction>()) ;
+        internal static void Register<TAbstraction>()
+            where TAbstraction:class =>
+            ServiceProvider.RegisterInstance(
+                ServiceProxy<TAbstraction>.Generate,
+                InstanceLifetime.Singleton);
 
         [STAThread]
         public void Initialize(bool testing = false)

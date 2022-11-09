@@ -3,12 +3,11 @@ namespace Applinate
 {
     public interface IInstanceRegistry
     {
-        object? GetInstance(Type serviceType);
+        object? Get(Type serviceType);
 
-        void RegisterSingleton<TAbstraction>(Func<TAbstraction> factory)
-            where TAbstraction : class;
-
-        void RegisterTransient<TAbstraction>(Func<TAbstraction> factory)
+        void Register<TAbstraction>(
+            Func<TAbstraction> factory, 
+            InstanceLifetime lifetime = InstanceLifetime.Transient)
             where TAbstraction : class;
     }
 }

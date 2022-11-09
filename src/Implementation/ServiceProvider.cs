@@ -1,12 +1,9 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Applinate
 {
     public static class ServiceProvider
     {
-        public static IServiceCollection ServiceCollection { get; private set; } = new ServiceCollection(); // UNDONE: not thread safe
-
         /// <summary>
         /// Locates the specified service.
         /// </summary>
@@ -32,20 +29,16 @@ namespace Applinate
             return result;
         }
 
-        public static void RegisterSingleton<TAbstraction>(Func<TAbstraction> factory)
+        public static void RegisterInstance<TAbstraction>(
+            Func<TAbstraction> factory, 
+            InstanceLifetime lifetime = InstanceLifetime.Transient)
             where TAbstraction : class =>
-            InstanceRegistry.RegisterSingleton(factory);
+            InstanceRegistry.RegisterInstance(factory, lifetime);
 
-        public static void RegisterTransient<TAbstraction>(Func<TAbstraction> factory)
-            where TAbstraction : class =>
-            InstanceRegistry.RegisterTransient(factory);
-
-        public static void SetServiceCollection(IServiceCollection services) =>
-            ServiceCollection = services;
-
-        internal static void RegisterSingleton<TAbstraction, TConcretion>()
+        internal static void RegisterInstance<TAbstraction, TConcretion>(
+            InstanceLifetime lifetime = InstanceLifetime.Transient)
             where TConcretion : TAbstraction, new()
             where TAbstraction: class =>
-            RegisterSingleton<TAbstraction>(() => new TConcretion());
+            RegisterInstance<TAbstraction>(() => new TConcretion(), lifetime);
     }
 }
