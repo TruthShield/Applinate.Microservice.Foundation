@@ -69,7 +69,7 @@ class Build : NukeBuild
     [Solution(GenerateProjects = true)]
     readonly Solution Solution;
 
-    static string Version = new Version(0, 1, 2).ToString();
+    static string Version = new Version(0, 2, 0).ToString();
 
     const string MasterBranch = "master";
     const string DevelopBranch = "develop";
