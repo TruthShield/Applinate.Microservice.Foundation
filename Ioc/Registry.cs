@@ -9,8 +9,7 @@ namespace Applinate
 
         private static IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
-        object? IInstanceRegistry.Get(Type serviceType) => 
-            Provider.GetService(serviceType);
+        object? IInstanceRegistry.Get(Type serviceType) => Provider.GetService(serviceType);
 
         void IInstanceRegistry.Register<TAbstraction>(
             Func<TAbstraction> factory, 

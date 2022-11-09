@@ -4,8 +4,8 @@ namespace Applinate
 {
     internal interface IRequestHandlerBuilder
     {
-        IRequestHandler<TArg1, TResult1> BuildRequestHandler<TArg1, TResult1>()
-            where TArg1 : class, IReturn<TResult1>
+        IRequestHandler<TRequest1, TResult1> BuildRequestHandler<TRequest1, TResult1>()
+            where TRequest1 : class, IReturn<TResult1>
             where TResult1 : class, IHaveRequestStatus;
     }
 }

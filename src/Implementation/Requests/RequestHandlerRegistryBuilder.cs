@@ -2,11 +2,7 @@
 
 namespace Applinate
 {
-    using Polly.Caching;
-    using System.ComponentModel;
     using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     internal static class RequestHandlerRegistryBuilder
     {
@@ -16,7 +12,7 @@ namespace Applinate
 
             var messageHandlers = BuildMessageCommanHandlers();
             var serviceHandlers = BuildserviceCommandHandlers();
-            var allHandlers     = Add(messageHandlers, serviceHandlers);
+            var allHandlers = Add(messageHandlers, serviceHandlers);
 
             return allHandlers;
         }
@@ -25,17 +21,17 @@ namespace Applinate
         {
             var x = new NestedDictionary<Type, Type, IRequestHandlerBuilder[]>(messageHandlers);
 
-            foreach(var outer in serviceHandlers)
+            foreach (var outer in serviceHandlers)
             {
                 var key1 = outer.Key;
 
-                foreach(var inner in outer.Value)
+                foreach (var inner in outer.Value)
                 {
                     var key2 = inner.Key;
 
                     var values = inner.Value;
 
-                    if(x.ContainsKey(key1, key2))
+                    if (x.ContainsKey(key1, key2))
                     {
                         x[key1][key2] = x[key1][key2].Union(values).ToArray();
                     }
@@ -43,46 +39,10 @@ namespace Applinate
                     {
                         x.Add(key1, key2, values);
                     }
-
                 }
             }
 
             return x;
-        }
-
-        private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildserviceCommandHandlers()
-        {
-            var qry =
-                from c in TypeRegistry.Classes
-                from i in c.GetInterfaces()
-                let si = i.GetCustomAttribute<ServiceAttribute>()
-                where si is not null
-                from m in i.GetMethods()
-                let args = m.GetParameters()
-                where args.Length == 1 ||
-                   (args.Length == 2 && args[1].ParameterType == typeof( CancellationToken))
-                let ret = m.ReturnParameter.ParameterType
-                where ret.GetGenericTypeDefinition() == typeof(Task<>)
-                let innerRet = ret.GetGenericArguments()[0]
-                let a0 = args[0].ParameterType
-                let targetType = typeof(IReturn<>).MakeGenericType(innerRet)
-                where a0.IsAssignableTo(targetType)
-                select (innerRet, args[0].ParameterType, m, c, i);
-
-            var items = qry.GroupBy(x => (x.ParameterType, x.innerRet)).ToArray();
-
-            var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder[]>();
-
-            foreach(var item in items)
-            {
-                var key1 = item.Key.ParameterType;
-                var key2 = item.Key.innerRet;
-
-                result.Add(key1, key2,
-                    item.Select(x => new ServiceRequestHandlerBuilder(x.c, x.m) as IRequestHandlerBuilder).ToArray());
-            }
-
-            return result;
         }
 
         private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildMessageCommanHandlers()
@@ -118,6 +78,41 @@ namespace Applinate
             return result;
         }
 
+        private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> BuildserviceCommandHandlers()
+        {
+            var qry =
+                from c in TypeRegistry.Classes
+                from i in c.GetInterfaces()
+                let si = i.GetCustomAttribute<ServiceAttribute>()
+                where si is not null
+                from m in i.GetMethods()
+                let args = m.GetParameters()
+                where args.Length == 1 ||
+                   (args.Length == 2 && args[1].ParameterType == typeof(CancellationToken))
+                let ret = m.ReturnParameter.ParameterType
+                where ret.GetGenericTypeDefinition() == typeof(Task<>)
+                let innerRet = ret.GetGenericArguments()[0]
+                let a0 = args[0].ParameterType
+                let targetType = typeof(IReturn<>).MakeGenericType(innerRet)
+                where a0.IsAssignableTo(targetType)
+                select (innerRet, args[0].ParameterType, m, c, i);
+
+            var items = qry.GroupBy(x => (x.ParameterType, x.innerRet)).ToArray();
+
+            var result = new NestedDictionary<Type, Type, IRequestHandlerBuilder[]>();
+
+            foreach (var item in items)
+            {
+                var key1 = item.Key.ParameterType;
+                var key2 = item.Key.innerRet;
+
+                result.Add(key1, key2,
+                    item.Select(x => new ServiceRequestHandlerBuilder(x.c, x.m) as IRequestHandlerBuilder).ToArray());
+            }
+
+            return result;
+        }
+
         private class MessageRequestHandlerBuilder : IRequestHandlerBuilder
         {
             public MessageRequestHandlerBuilder(Type argType, Type resultType, Type implementationType)
@@ -131,11 +126,11 @@ namespace Applinate
             public Type ImplementationType { get; }
             public Type ResultType { get; }
 
-            public IRequestHandler<TArg1, TResult1> BuildRequestHandler<TArg1, TResult1>()
-                where TArg1 : class, IReturn<TResult1>
+            public IRequestHandler<TRequest1, TResult1> BuildRequestHandler<TRequest1, TResult1>()
+                where TRequest1 : class, IReturn<TResult1>
                 where TResult1 : class, IHaveRequestStatus
             {
-                if (typeof(TArg1) != ArgType)
+                if (typeof(TRequest1) != ArgType)
                 {
                     throw new ArgumentException("expecting type " + ArgType);
                 }
@@ -145,31 +140,8 @@ namespace Applinate
                     throw new ArgumentException("expecting type " + ResultType);
                 }
 
-                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TArg1, TResult1> ?? throw ExceptionFactory.UnexpectedNull();
+                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TRequest1, TResult1> ?? throw ExceptionFactory.UnexpectedNull();
             }
-        }
-
-        private class ServiceRequestHandlerMap<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
-            where TRequest : class, IReturn<TResponse>
-            where TResponse : class, IHaveRequestStatus
-        {
-            public ServiceRequestHandlerMap(Type implementationType, MethodInfo methodInfo)
-            {
-                ImplementationType = implementationType;
-                MethodInfo = methodInfo;
-            }
-
-            public Type ImplementationType { get; }
-            public MethodInfo MethodInfo { get; }
-
-            public Task<TResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default) => 
-                MethodInfo.Invoke(
-                    Activator.CreateInstance(ImplementationType),
-                    new object[]
-                    {
-                        arg,
-                        cancellationToken
-                    }) as Task<TResponse> ?? throw new InvalidCastException();
         }
 
         private class ServiceRequestHandlerBuilder : IRequestHandlerBuilder
@@ -183,10 +155,33 @@ namespace Applinate
             public Type ImplementationType { get; }
             public MethodInfo MethodInfo { get; }
 
-            public IRequestHandler<TArg1, TResult1> BuildRequestHandler<TArg1, TResult1>()
-                where TArg1 : class, IReturn<TResult1>
-                where TResult1 : class, IHaveRequestStatus => 
-                new ServiceRequestHandlerMap<TArg1, TResult1>(ImplementationType, MethodInfo);
+            public IRequestHandler<TRequest1, TResult1> BuildRequestHandler<TRequest1, TResult1>()
+                where TRequest1 : class, IReturn<TResult1>
+                where TResult1 : class, IHaveRequestStatus =>
+                new ServiceRequestHandlerMap<TRequest1, TResult1>(ImplementationType, MethodInfo);
+        }
+
+        private class ServiceRequestHandlerMap<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+                    where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveRequestStatus
+        {
+            public ServiceRequestHandlerMap(Type implementationType, MethodInfo methodInfo)
+            {
+                ImplementationType = implementationType;
+                MethodInfo = methodInfo;
+            }
+
+            public Type ImplementationType { get; }
+            public MethodInfo MethodInfo { get; }
+
+            public Task<TResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default) =>
+                MethodInfo.Invoke(
+                    Activator.CreateInstance(ImplementationType),
+                    new object[]
+                    {
+                        arg,
+                        cancellationToken
+                    }) as Task<TResponse> ?? throw new InvalidCastException();
         }
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Applinate
 {
-    public delegate Task<TResult> ExecuteDelegate<TArg, TResult>(
-            TArg arg,
+    public delegate Task<TResult> ExecuteDelegate<TRequest, TResult>(
+            TRequest arg,
             CancellationToken cancellationToken)
-        where TArg : class, IReturn<TResult>
+        where TRequest : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus;
 
 }

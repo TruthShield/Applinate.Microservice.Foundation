@@ -7,7 +7,6 @@ namespace Applinate
     public static class InitializationProvider
     {
         private static bool initialized = false;
-        private static object initializedLock = new object();
 
         [STAThread]
         public static void Initialize(bool testing = false)
@@ -73,7 +72,6 @@ namespace Applinate
             string message = "CommandContext Changed " + e.ToString();
             Debug.WriteLine(message);
             Trace.TraceInformation(message);
-            //Service.Locate<ILogger>()?.Log(LogLevel.Information, message); //todo: wire in logging
         }
 
         [Conditional("DEBUG")]

@@ -51,11 +51,11 @@ Only exection of {accepted} services are allowed from {commandType} services.
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ");
 
-        public static Exception NoRegisteredService<TService>() =>
-            typeof(TService).FullName switch
+        public static Exception NoRegisteredService<TAbstraction>() =>
+            typeof(TAbstraction).FullName switch
             {
                 "Microsoft.Extensions.Configuration.IConfiguration" => NoConfigurationService(),
-                _ => NoGeneralRegisteredService<TService>()
+                _ => NoGeneralRegisteredService<TAbstraction>()
             };
 
         private static Exception NoConfigurationService() =>
@@ -87,12 +87,17 @@ static class Program
 -----------------------------------------------------------------------------------
 ");
 
-        private static Exception NoGeneralRegisteredService<TService>() =>
+        private static Exception NoGeneralRegisteredService<TAbstraction>() =>
             new InvalidOperationException($@"
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-no service has been registered for type {typeof(TService).FullName}.
+no service has been registered for type {typeof(TAbstraction).FullName}.
 
-Add this by using the Initialization utility and registering on startup with is code: services.AddSingleton<{typeof(TService).GetFriendlyName()}, MyImplementation>();.
+For your implementation to be discovered, your assembly name MUST follow Applinate conventions:
+* the orchestration service assembly name must be ""*.Orchestrate.*"" or ""*.Orchestration.*""
+* the calculation service assembly name must be ""*.Calculate.*"" or ""*.Calculation.*""
+* the integration service assembly name must be ""*.Integrate.*"" or ""*.Integration.*""
+
+Use the Initialization utility to register you implementation on startup with is code: services.AddSingleton<{typeof(TAbstraction).GetFriendlyName()}, MyImplementation>();.
 
 This is done on application initialization, usually in a class that inherits from 'IInitialize'
 
@@ -103,7 +108,7 @@ internal sealed class MyLazyInitializer : IInitialize
 {{
     public void Initialize(IServiceCollection services, bool testing = false)
     {{
-        services.AddSingleton<{typeof(TService).GetFriendlyName()}, MyImplementation>();
+        services.AddSingleton<{typeof(TAbstraction).GetFriendlyName()}, MyImplementation>();
 
         // more initialization here
     }}
@@ -154,27 +159,28 @@ internal sealed class MyLazyInitializer : IInitialize
         public static Exception UnexpectedNull() => new InvalidOperationException("unexpected null");
 
 
-        public static Exception NoDefinedService<TArg, TResult>() =>
+        public static Exception NoDefinedService<TRequest, TResult>() =>
             new InvalidOperationException($@"
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 no handler is defined for executing a command 
-for type {typeof(TArg).GetFriendlyName(true)}:IReturns<{typeof(TResult).GetFriendlyName(true)}>{{}}.
+for type {typeof(TRequest).GetFriendlyName(true)}:IReturn<{typeof(TResult).GetFriendlyName(true)}>{{}}.
 
 You need to define a handler for the command that resides
 in the same directory as the other assemblies (*.dll files).
 
-The assembly name MUST follow this convention
-* the orchestration service assembly name must be ""*.Orchestrate.*""
-* the calculation service assembly name must be ""*.Calculate.*""
-* the integration service assembly name must be ""*.Integrate.*""
+For your implementation to be discovered, your assembly name MUST follow Applinate conventions:
+* the orchestration service assembly name must be ""*.Orchestrate.*"" or ""*.Orchestration.*""
+* the calculation service assembly name must be ""*.Calculate.*"" or ""*.Calculation.*""
+* the integration service assembly name must be ""*.Integrate.*"" or ""*.Integration.*""
+
 
 -----------------------------------------------------------------------------------
 
-internal class MyHandler : IRequestHandler<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
+internal class MyHandler : IRequestHandler<{typeof(TRequest).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 
     public Task<{typeof(TResult).GetFriendlyName()}> ExecuteAsync(
-            {typeof(TArg).GetFriendlyName()} arg,
+            {typeof(TRequest).GetFriendlyName()} arg,
             CancellationToken cancellationToken = default)
             {{ 
 
@@ -190,11 +196,11 @@ If you are in unit tests and need to mock you have two options:
 assembly or an assembly directly referenced by your test assembly with the signature:
 
 -----------------------------------------------------------------------------------
-internal class MyEmulator : IRequestHandler<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
+internal class MyEmulator : IRequestHandler<{typeof(TRequest).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>
 {{
 
     public Task<{typeof(TResult).GetFriendlyName()}> ExecuteAsync(
-        {typeof(TArg).GetFriendlyName()} arg,
+        {typeof(TRequest).GetFriendlyName()} arg,
         CancellationToken cancellationToken = default)
         {{ 
 
@@ -213,7 +219,7 @@ pubic class MyTest
     public void DoesWhatIExpect()
     {{
         // set up mock
-        TestHelper.MockCommandForTestDuration<{typeof(TArg).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>(arg =>
+        TestHelper.MockCommandForTestDuration<{typeof(TRequest).GetFriendlyName()}, {typeof(TResult).GetFriendlyName()}>(arg =>
         {{
                 return new {typeof(TResult).GetFriendlyName()}(); // return mocked value 
         }});

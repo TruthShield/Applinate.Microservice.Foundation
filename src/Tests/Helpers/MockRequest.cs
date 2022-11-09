@@ -9,14 +9,14 @@ namespace Applinate.Test
     /// <summary>
     /// Class MockCommand.
     /// </summary>
-    /// <typeparam name="TArg">The type of the t argument.</typeparam>
+    /// <typeparam name="TRequest">The type of the t argument.</typeparam>
     /// <typeparam name="TResult">The type of the t result.</typeparam>
-    public static class MockRequest<TArg, TResult>
-        where TArg : class, IReturn<TResult>
+    public static class MockRequest<TRequest, TResult>
+        where TRequest : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
     {
-        private static readonly AsyncLocal<MockCommandExecutor<TArg, TResult>> _Executor = new();
-        private static readonly MockCommandExecutor<TArg, TResult> _GlobalExecutor = new();
+        private static readonly AsyncLocal<MockCommandExecutor<TRequest, TResult>> _Executor = new();
+        private static readonly MockCommandExecutor<TRequest, TResult> _GlobalExecutor = new();
 
         /// <summary>
         /// Gets a value indicating whether this instance is set.
@@ -44,8 +44,8 @@ namespace Applinate.Test
             _Executor.Value.Behavior = null;
         }
 
-        //internal static void SetGlobally<TArg, TResult>(Func<TArg, TResult> behavior)
-        //    where TArg : class, IReturn<TResult>
+        //internal static void SetGlobally<TRequest, TResult>(Func<TRequest, TResult> behavior)
+        //    where TRequest : class, IReturn<TResult>
         //    where TResult : class
         //{
         //    _Executor.Value.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
@@ -53,11 +53,11 @@ namespace Applinate.Test
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void Set(Func<TArg, CancellationToken, Task<TResult>> behavior)
+        public static void Set(Func<TRequest, CancellationToken, Task<TResult>> behavior)
         {
             if (_Executor.Value is null)
             {
-                _Executor.Value = new MockCommandExecutor<TArg, TResult>();
+                _Executor.Value = new MockCommandExecutor<TRequest, TResult>();
             }
 
             _Executor.Value.Behavior = behavior;
@@ -67,24 +67,24 @@ namespace Applinate.Test
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void SetForTestScope(Func<TArg, TResult> behavior)
+        public static void SetForTestScope(Func<TRequest, TResult> behavior)
         {
             if (_Executor.Value is null)
             {
-                _Executor.Value = new MockCommandExecutor<TArg, TResult>();
+                _Executor.Value = new MockCommandExecutor<TRequest, TResult>();
             }
 
             _Executor.Value.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
             // TODO: set commandhelper
         }
 
-        public static void SetGlobally(Func<TArg, TResult> behavior)
+        public static void SetGlobally(Func<TRequest, TResult> behavior)
         {
             _GlobalExecutor.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
             // TODO: set commandhelper
         }
 
-        internal static Task<TResult> Execute(TArg arg, CancellationToken cancellationToken)
+        internal static Task<TResult> Execute(TRequest arg, CancellationToken cancellationToken)
         {
             if (_Executor?.Value?.Behavior is not null)
             {

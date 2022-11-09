@@ -2,6 +2,7 @@
 namespace Applinate
 {
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     internal class ServiceProxyFactory:IInitialize
     {
@@ -9,6 +10,7 @@ namespace Applinate
 
         private static bool _Initialized = false;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void Register<TAbstraction>()
             where TAbstraction:class =>
             ServiceProvider.Register(
@@ -43,14 +45,14 @@ namespace Applinate
             }        
         }
 
-        private class ServiceProxy<TInterface> : DispatchProxy
+        private class ServiceProxy<TAbstraction> : DispatchProxy
         {
             private static readonly Dictionary<MethodInfo, Func<object[], object>> _Execution = new();
 
             private static bool _Initialzed;
 
-            public static TInterface Generate() =>
-                Create<TInterface, ServiceProxy<TInterface>>();
+            public static TAbstraction Generate() =>
+                Create<TAbstraction, ServiceProxy<TAbstraction>>();
 
             public Task<TResponse> ExecuteAsync<TRequest, TResponse>(
                 TRequest request,
@@ -83,7 +85,7 @@ namespace Applinate
                     return;
                 }
 
-                var serviceAttribute = typeof(TInterface).GetCustomAttribute<ServiceAttribute>();
+                var serviceAttribute = typeof(TAbstraction).GetCustomAttribute<ServiceAttribute>();
 
                 if (serviceAttribute is null)
                 {
@@ -92,7 +94,7 @@ namespace Applinate
 
                 var serviceCommandType = serviceAttribute.CommandType;
 
-                var methods = typeof(TInterface).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+                var methods = typeof(TAbstraction).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
                 foreach (var method in methods)
                 {

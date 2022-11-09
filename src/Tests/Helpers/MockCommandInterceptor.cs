@@ -11,11 +11,11 @@
     [Intercept(-2100000000)]
     internal sealed class MockCommandInterceptor : InterceptorFactoryBase
     {
-        public override Task<TResult> ExecuteAsync<TArg, TResult>(ExecuteDelegate<TArg, TResult> next, TArg arg, CancellationToken cancellationToken)
+        public override Task<TResult> ExecuteAsync<TRequest, TResult>(ExecuteDelegate<TRequest, TResult> next, TRequest arg, CancellationToken cancellationToken)
         {
-            if (MockRequest<TArg, TResult>.IsSet)
+            if (MockRequest<TRequest, TResult>.IsSet)
             {
-                return MockRequest<TArg, TResult>.Execute(arg, cancellationToken);
+                return MockRequest<TRequest, TResult>.Execute(arg, cancellationToken);
             }
 
             return next(arg, cancellationToken);

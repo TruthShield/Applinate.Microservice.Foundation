@@ -7,16 +7,16 @@ namespace Applinate
         /// <summary>
         /// Locates the specified service.
         /// </summary>
-        /// <typeparam name="TService">The type of the t service.</typeparam>
+        /// <typeparam name="TAbstraction">The type of the t service.</typeparam>
         /// <param name="fallback">The fallback value if no service is provided.</param>
-        /// <returns>TService.</returns>
+        /// <returns>TAbstraction.</returns>
         /// <exception cref="System.InvalidOperationException">Unable to build the service provider.</exception>
-        /// <exception cref="System.InvalidOperationException">no service has been registered for type {typeof(TService)}, add this by calling ServiceLocator.Register<TService,TImplementation>()")</exception>
-        public static TService Locate<TService>(TService? fallback = default)
+        /// <exception cref="System.InvalidOperationException">no service has been registered for type {typeof(TAbstraction)}, add this by calling ServiceLocator.Register<TAbstraction,TImplementation>()")</exception>
+        public static TAbstraction Locate<TAbstraction>(TAbstraction? fallback = default)
         {
-            var result = InstanceRegistry.GetInstance<TService>();
+            var result = InstanceRegistry.GetInstance<TAbstraction>();
 
-            return result is null ? fallback is null ? throw ExceptionFactory.NoRegisteredService<TService>() : fallback : result;
+            return result is null ? fallback is null ? throw ExceptionFactory.NoRegisteredService<TAbstraction>() : fallback : result;
         }
 
         public static void Register<TAbstraction>(

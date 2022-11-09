@@ -54,14 +54,14 @@ namespace Applinate
                 });
         }
 
-        private static async Task<TResult> InternalExecuteAsync<TArg, TResult>(
-            TArg arg,
+        private static async Task<TResult> InternalExecuteAsync<TRequest, TResult>(
+            TRequest arg,
             CancellationToken cancellationToken = default)
-            where TArg : class, IReturn<TResult>
+            where TRequest : class, IReturn<TResult>
             where TResult : class, IHaveRequestStatus
         {
             var commandExecutor = ServiceProvider.Locate<IRequestExecutor>();
-            var executorResult = await commandExecutor.ExecuteAsync<TArg, TResult>(arg, cancellationToken).ConfigureAwait(false);
+            var executorResult = await commandExecutor.ExecuteAsync<TRequest, TResult>(arg, cancellationToken).ConfigureAwait(false);
             return executorResult;
         }
     }

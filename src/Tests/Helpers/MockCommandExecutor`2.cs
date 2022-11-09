@@ -9,19 +9,19 @@ namespace Applinate.Test
 
     /// <summary>
     /// Class MockCommandExecutor. This class cannot be inherited.
-    /// Implements the <see cref="Applinate.IRequestHandler{TArg, TResult}" />
+    /// Implements the <see cref="Applinate.IRequestHandler{TRequest, TResult}" />
     /// </summary>
-    /// <typeparam name="TArg">The type of the t argument.</typeparam>
+    /// <typeparam name="TRequest">The type of the t argument.</typeparam>
     /// <typeparam name="TResult">The type of the t result.</typeparam>
-    /// <seealso cref="Applinate.IRequestHandler{TArg, TResult}" />
+    /// <seealso cref="Applinate.IRequestHandler{TRequest, TResult}" />
     [BypassSafetyChecks]
-    internal sealed class MockCommandExecutor<TArg, TResult> : IRequestHandler<TArg, TResult>
-        where TArg : class, IReturn<TResult>
+    internal sealed class MockCommandExecutor<TRequest, TResult> : IRequestHandler<TRequest, TResult>
+        where TRequest : class, IReturn<TResult>
         where TResult : class, IHaveRequestStatus
     {
-        public Func<TArg, CancellationToken, Task<TResult>>? Behavior;
+        public Func<TRequest, CancellationToken, Task<TResult>>? Behavior;
 
-        public Task<TResult> ExecuteAsync(TArg arg, CancellationToken cancellationToken = default)
+        public Task<TResult> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default)
         {
             if (Behavior is not null)
             {

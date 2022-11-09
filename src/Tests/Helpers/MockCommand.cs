@@ -10,37 +10,37 @@ namespace Applinate.Test
     /// <summary>
     /// Class MockCommand.
     /// </summary>
-    /// <typeparam name="TArg">The type of the t argument.</typeparam>
+    /// <typeparam name="TRequest">The type of the t argument.</typeparam>
     public static class MockCommand
 
     {
-        public static void Clear<TArg>() where TArg : class, IReturn<CommandResponse> =>
-            MockRequest<TArg, CommandResponse>.Clear();
+        public static void Clear<TRequest>() where TRequest : class, IReturn<CommandResponse> =>
+            MockRequest<TRequest, CommandResponse>.Clear();
 
         /// <summary>
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void SetForTestScope<TArg>(Func<TArg, CancellationToken, Task<CommandResponse>> behavior)
-            where TArg : class, IReturn<CommandResponse> =>
-            MockRequest<TArg, CommandResponse>.Set(behavior);
+        public static void SetForTestScope<TRequest>(Func<TRequest, CancellationToken, Task<CommandResponse>> behavior)
+            where TRequest : class, IReturn<CommandResponse> =>
+            MockRequest<TRequest, CommandResponse>.Set(behavior);
 
         /// <summary>
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void SetForTestScope<TArg>(Func<TArg, CommandResponse> behavior)
-            where TArg : class, IReturn<CommandResponse> =>
-            MockRequest<TArg, CommandResponse>.SetForTestScope(behavior);
+        public static void SetForTestScope<TRequest>(Func<TRequest, CommandResponse> behavior)
+            where TRequest : class, IReturn<CommandResponse> =>
+            MockRequest<TRequest, CommandResponse>.SetForTestScope(behavior);
 
         /// <summary>
         /// Sets for test scope.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void SetForTestScope<TArg>(Action<TArg> behavior)
-            where TArg : class, IReturn<CommandResponse> =>
+        public static void SetForTestScope<TRequest>(Action<TRequest> behavior)
+            where TRequest : class, IReturn<CommandResponse> =>
 
-            MockRequest<TArg, CommandResponse>.SetForTestScope(
+            MockRequest<TRequest, CommandResponse>.SetForTestScope(
                 a =>
                 {
                     behavior(a);

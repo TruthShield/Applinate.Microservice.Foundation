@@ -22,9 +22,9 @@ namespace Applinate.Foundation.Commands.Interceptors
                     { ServiceType.Integration, new[]{ ServiceType.Tool} }
                 });
 
-        public override Task<TResult> ExecuteAsync<TArg, TResult>(
-            ExecuteDelegate<TArg, TResult> next,
-            TArg arg,
+        public override Task<TResult> ExecuteAsync<TRequest, TResult>(
+            ExecuteDelegate<TRequest, TResult> next,
+            TRequest arg,
             CancellationToken cancellationToken)
         {
             var currentServiceType = RequestContext.Current?.ServiceType ?? ServiceType.None;
@@ -34,7 +34,7 @@ namespace Applinate.Foundation.Commands.Interceptors
                 throw ExceptionFactory.CommandContextUnknown();
             }
 
-            var commandType = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>()?.CommandType ?? ServiceType.None;
+            var commandType = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>()?.CommandType ?? ServiceType.None;
 
             if (_Allowed[currentServiceType].Contains(commandType))
             {

@@ -6,18 +6,18 @@ namespace Applinate
 
     /// <summary>
     /// Class DispatchedCommandInterceptorBase.
-    /// Implements the <see cref="TS.Utility.CommandInterceptorBase{TArg, TS.Utility.DispatchedCommandResponse}" />
+    /// Implements the <see cref="TS.Utility.CommandInterceptorBase{TRequest, TS.Utility.DispatchedCommandResponse}" />
     /// </summary>
-    /// <typeparam name="TArg">The type of the t argument.</typeparam>
-    /// <seealso cref="TS.Utility.CommandInterceptorBase{TArg, TS.Utility.DispatchedCommandResponse}" />
-    public class CommandInterceptorBase<TArg> : RequestInterceptorBase<TArg, CommandResponse>
-    where TArg : class, IReturn<CommandResponse>
+    /// <typeparam name="TRequest">The type of the t argument.</typeparam>
+    /// <seealso cref="TS.Utility.CommandInterceptorBase{TRequest, TS.Utility.DispatchedCommandResponse}" />
+    public class CommandInterceptorBase<TRequest> : RequestInterceptorBase<TRequest, CommandResponse>
+    where TRequest : class, IReturn<CommandResponse>
     {
-        public CommandInterceptorBase(ExecuteDelegate<TArg, CommandResponse> core) : base(core)
+        public CommandInterceptorBase(ExecuteDelegate<TRequest, CommandResponse> core) : base(core)
         {
         }
 
-        public override Task<CommandResponse> ExecuteAsync(TArg arg, CancellationToken cancellationToken)
+        public override Task<CommandResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken)
         {
             return base.ExecuteAsync(arg, cancellationToken);
         }
@@ -27,7 +27,7 @@ namespace Applinate
             return base.PostProcessAsync(result);
         }
 
-        protected override Task<TArg> PreProcessAsync(TArg arg)
+        protected override Task<TRequest> PreProcessAsync(TRequest arg)
         {
             return base.PreProcessAsync(arg);
         }

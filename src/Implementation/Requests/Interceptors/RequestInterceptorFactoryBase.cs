@@ -7,11 +7,11 @@ namespace Applinate
     public abstract class InterceptorFactoryBase
     {
         [DebuggerHidden]
-        public virtual Task<TResult> ExecuteAsync<TArg, TResult>(
-            ExecuteDelegate<TArg, TResult> next,
-            TArg arg,
+        public virtual Task<TResult> ExecuteAsync<TRequest, TResult>(
+            ExecuteDelegate<TRequest, TResult> next,
+            TRequest arg,
             CancellationToken cancellationToken)
-            where TArg : class, IReturn<TResult>
+            where TRequest : class, IReturn<TResult>
             where TResult : class, IHaveRequestStatus =>
             next(arg, cancellationToken) ?? Task.FromResult<TResult>(default);
     }
