@@ -78,7 +78,6 @@ namespace Applinate.Foundation.Test
                     case 1:
                         RequestContext.Current.ServiceType.Should().Be(ServiceType.Integration, "access entry");
                         throw new InvalidOperationException("test exception to check flow when a fault occurrs in the child");
-                        break;
                     default:
                         break;
                 }

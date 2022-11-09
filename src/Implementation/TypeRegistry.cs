@@ -76,7 +76,7 @@ namespace Applinate
                 assembliesToCheck.Enqueue(a);
             }
 
-            assembliesToCheck.Enqueue(Assembly.GetEntryAssembly());
+            assembliesToCheck.Enqueue(Assembly.GetEntryAssembly() ?? throw ExceptionFactory.UnexpectedNull());
 
             while (assembliesToCheck.Any())
             {

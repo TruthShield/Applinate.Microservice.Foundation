@@ -35,7 +35,7 @@ namespace Applinate
         /// threads to receive notice of cancellation.</param>
         /// <returns>Task&lt;TResult&gt;.</returns>
         [DebuggerStepThrough, DebuggerHidden]
-        public static Task<TResult?> ExecuteAsync<TResult>(
+        public static Task<TResult> ExecuteAsync<TResult>(
             this IReturn<TResult> command,
             CancellationToken cancellationToken = default)
             where TResult : class, IHaveRequestStatus
@@ -50,7 +50,7 @@ namespace Applinate
                     var mi2 = mi?.MakeGenericMethod(command.GetType(), typeof(TResult));
                     var result = mi2?.Invoke(null, new object[] { command, cancellationToken });
 
-                    return result as Task<TResult?> ?? Task.FromResult(default(TResult));
+                    return result as Task<TResult> ?? Task.FromResult<TResult>(default);
                 });
         }
 

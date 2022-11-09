@@ -8,12 +8,8 @@ namespace Applinate.Foundation.Test
         [Fact]
         public async Task DispatchRequestFromInterface()
         {
-            // TODO: create all service proxies ahead of time.
-
-            // TOOD: add implementation option for interfaces.
-
-            var proxy = ServiceProvider.Locate<IMy_0010_Service>();// ServiceProxyFactory.Build<IMy_0010_Service>();
-            var response = proxy.HandleRequestAsync(new());
+            var proxy = ServiceProvider.Locate<IMy_0010_Service>();
+            var response = await proxy.HandleRequestAsync(new());
 
             _ = response;
         }
@@ -21,10 +17,10 @@ namespace Applinate.Foundation.Test
         [Fact()]
         public async Task HandleRequestFromInterfaceImplementation()
         {
-            var proxy = ServiceProvider.Locate<IMy_011_Service>();// ServiceProxyFactory.Build<IMy_0010_Service>();
+            var proxy = ServiceProvider.Locate<IMy_011_Service>();
             var response = await proxy.HandleRequestAsync(new()
             {
-                Value = 123
+                Value = 123,
             });
 
             response.Value.Should().Be(123);

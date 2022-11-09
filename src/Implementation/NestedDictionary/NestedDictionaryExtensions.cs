@@ -38,7 +38,9 @@ namespace Applinate
             Assert.IsNotNull(valueSelector, nameof(valueSelector));
 
             NestedDictionary<TKey1, TKey2, TValue> dictionary = 
-                new NestedDictionary<TKey1, TKey2, TValue>(comparer1, comparer2);
+                new NestedDictionary<TKey1, TKey2, TValue>(
+                    comparer1 ?? throw ExceptionFactory.UnexpectedNull(),
+                    comparer2 ?? throw ExceptionFactory.UnexpectedNull());
 
 			foreach (TSource element in source)
 				dictionary.Add(
@@ -89,9 +91,9 @@ namespace Applinate
             Assert.IsNotNull(elementSelector, nameof(elementSelector));
 
 			var dictionary = new NestedDictionary<TKey1, TKey2, TKey3, TElement>(
-                comparer1,
-                comparer2,
-                comparer3);
+                comparer1 ?? throw ExceptionFactory.UnexpectedNull(),
+                comparer2 ?? throw ExceptionFactory.UnexpectedNull(),
+                comparer3 ?? throw ExceptionFactory.UnexpectedNull());
 
 			foreach (TSource element in source)
 				dictionary.Add(

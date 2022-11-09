@@ -34,8 +34,11 @@ namespace Applinate
 
             foreach(var serviceInterface in qry)
             {
-                typeof(ServiceProxyFactory)
-                    .GetMethod(nameof(ServiceProxyFactory.Register), BindingFlags.Static | BindingFlags.NonPublic)
+                var mth = typeof(ServiceProxyFactory)?
+                    .GetMethod(nameof(ServiceProxyFactory.Register), BindingFlags.Static | BindingFlags.NonPublic) 
+                    ?? throw ExceptionFactory.UnexpectedNull();
+
+                mth
                     .MakeGenericMethod(serviceInterface)
                     .Invoke(null, null);
             }        
@@ -50,7 +53,7 @@ namespace Applinate
             public static TInterface Generate() =>
                 Create<TInterface, ServiceProxy<TInterface>>();
 
-            public Task<TResponse?> ExecuteAsync<TRequest, TResponse>(
+            public Task<TResponse> ExecuteAsync<TRequest, TResponse>(
                 TRequest request,
                 CancellationToken cancellationToken)
                 where TRequest : class, IReturn<TResponse>
@@ -67,11 +70,11 @@ namespace Applinate
                 return _Execution[targetMethod](args);
             }
 
-            private object Execute(Type[] types, object[] args) =>
-                this.GetType()
-                .GetMethod(nameof(ExecuteAsync))
+            private object? Execute(Type[] types, object[] args) =>
+                GetType()?
+                .GetMethod(nameof(ExecuteAsync))?
                 .MakeGenericMethod(types)
-                .Invoke(this, args);
+                .Invoke(this, args) ?? throw ExceptionFactory.UnexpectedNull();
 
             [STAThread]
             private void Initialize()
@@ -155,7 +158,7 @@ namespace Applinate
                     throw new InvalidOperationException("bad 4");
                 }
 
-                _Execution.Add(method, new((args) => Execute(new[] { first, returnInnerType }, args)));
+                _Execution.Add(method, new((args) => Execute(new[] { first, returnInnerType }, args) ?? throw ExceptionFactory.UnexpectedNull()));
             }
         }
     }

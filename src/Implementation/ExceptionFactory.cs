@@ -21,7 +21,7 @@ namespace Applinate
                 { typeof(ushort) , "ushort"  },
                 { typeof(uint)   , "uint"    },
                 { typeof(ulong)  , "ulong"   },
-                { typeof(void)   , "void"    }
+                { typeof(void)   , "void"    },
             };
 
         public static Exception CommandContextUnknown() => new InvalidOperationException($@"
@@ -119,11 +119,11 @@ internal sealed class MyLazyInitializer : IInitialize
                 return friendlyName;
             }
 
-            friendlyName = includeNamespace? type.FullName : type.Name;
+            friendlyName = (includeNamespace? type.FullName : type.Name) ?? throw ExceptionFactory.UnexpectedNull();
 
             if (type.IsGenericType)
             {
-                int backtick = friendlyName.IndexOf('`');
+                int backtick = friendlyName.IndexOf('`', StringComparison.OrdinalIgnoreCase);
 
                 if (backtick > 0)
                 {
@@ -148,8 +148,11 @@ internal sealed class MyLazyInitializer : IInitialize
                 return type.GetElementType().GetFriendlyName() + "[]";
             }
 
-            return friendlyName;
+            return friendlyName ?? throw UnexpectedNull();
         }
+
+        public static Exception UnexpectedNull() => new InvalidOperationException("unexpected null");
+
 
         public static Exception NoDefinedService<TArg, TResult>() =>
             new InvalidOperationException($@"

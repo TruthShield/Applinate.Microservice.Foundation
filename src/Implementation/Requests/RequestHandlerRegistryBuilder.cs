@@ -146,7 +146,7 @@ namespace Applinate
                     throw new ArgumentException("expecting type " + ResultType);
                 }
 
-                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TArg1, TResult1>;
+                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TArg1, TResult1> ?? throw ExceptionFactory.UnexpectedNull();
             }
         }
 

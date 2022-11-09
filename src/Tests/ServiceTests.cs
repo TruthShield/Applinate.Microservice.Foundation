@@ -16,11 +16,4 @@ namespace Applinate.Foundation.Test
             service.Should().NotBeNull();
         }
     }
-
-    internal sealed class RegistrationTestService:IRegistrationTestService
-    {
-
-    }
-
-    internal interface IRegistrationTestService { }
 }

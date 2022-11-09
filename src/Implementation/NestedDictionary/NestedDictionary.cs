@@ -63,7 +63,7 @@ namespace Applinate
 
         public new NestedDictionary<TKey2, TValue> this[TKey1 key1]
         {
-            get => TryGetValue(key1, out NestedDictionary<TKey2, TValue> dict) ? dict : base[key1] = new NestedDictionary<TKey2, TValue>(Capacity2, Comparer2);
+            get => TryGetValue(key1, out var dict) ? dict : base[key1] = new NestedDictionary<TKey2, TValue>(Capacity2, Comparer2);
             set => base[key1] = value;
         }
 
@@ -156,8 +156,8 @@ namespace Applinate
                 new NestedDictionary<TKey2, TKey3, TValue>(
                     Capacity2, 
                     Capacity3, 
-                    Comparer2, 
-                    Comparer3);
+                    Comparer2 ?? throw ExceptionFactory.UnexpectedNull(), 
+                    Comparer3 ?? throw ExceptionFactory.UnexpectedNull());
 
             set => base[key1] = value;
         }

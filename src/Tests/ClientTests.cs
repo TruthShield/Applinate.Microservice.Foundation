@@ -13,7 +13,7 @@ namespace Applinate.Foundation.Test
         [Fact()]
         public async Task ClientTest()
         {
-            ServiceClient c = new ServiceClient(Guid.NewGuid(), new(Guid.NewGuid(), 1,2,3));
+            ServiceClient c = new (Guid.NewGuid(), new(Guid.NewGuid(), 1,2,3));
 
             c.StartNewConversation();
 
@@ -25,9 +25,11 @@ namespace Applinate.Foundation.Test
 
             var result = await command.ExecuteAsync();
 
-            result.PreNumber.Should().Be(2);
+            _ = result.Should().NotBeNull();
 
-            result.PostNumber.Should().Be(1);
+            _ = result.PreNumber.Should().Be(2);
+
+            _ = result.PostNumber.Should().Be(1);
         }
     }
 }

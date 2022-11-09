@@ -1,22 +1,7 @@
-// Copyright (c) TruthShield, LLC. All rights reserved.
+﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 
 namespace Applinate.Foundation.Test
 {
-    [ServiceRequest(ServiceType.Orchestration)]
-    public class My_001_UnitTestCommand : IReturn<My_001_UnitTestCommandResult>
-    {
-        public int PostNumber { get; set; }
-        public int PreNumber { get; set; }
-    }
-
-    public class My_001_UnitTestCommandResult : IHaveRequestStatus
-    {
-        public int PostNumber { get; set; }
-        public int PreNumber { get; set; }
-
-        public RequestStatus Status => throw new NotImplementedException();
-    }
-
     [ServiceRequest(ServiceType.Orchestration)]
     public class My_001_UntiTestCommandExecutor : IRequestHandler<My_001_UnitTestCommand, My_001_UnitTestCommandResult>
     {
