@@ -18,27 +18,15 @@ namespace Applinate
         //     of type serviceType.
         internal static object? GetInstance(Type serviceType) => Instance.GetInstance(serviceType); //UNDONE: check instance exists and
 
-        internal static T GetInstance<T>() => (T)(Instance.GetInstance(typeof(T)) ?? default); // UNDONE: check for null and throw
+        internal static TAbstraction GetInstance<TAbstraction>() => (TAbstraction)(Instance.GetInstance(typeof(TAbstraction)) ?? default); // UNDONE: check for null and throw
 
-        internal static void RegisterSingleton<TAbstraction, TConcretion>()
-            where TAbstraction : class
-            where TConcretion : class, TAbstraction =>
-            Instance.RegisterSingleton<TAbstraction, TConcretion>();
-
-        [Obsolete]
         internal static void RegisterSingleton<TAbstraction>(Func<TAbstraction> factory)
             where TAbstraction : class =>
-            Instance.RegisterSingleton<TAbstraction>(factory);
+            Instance.RegisterSingleton(factory);
 
-        internal static void RegisterSingleton<TAbstraction, TConcretion>(Func<object, TConcretion> factory)
-            where TAbstraction : class
-            where TConcretion : class, TAbstraction =>
-            Instance.RegisterSingleton<TAbstraction, TConcretion>(factory);
-
-        [Obsolete]
         internal static void RegisterTransient<TAbstraction>(Func<TAbstraction> factory)
             where TAbstraction : class =>
-            Instance.RegisterTransient<TAbstraction>(factory);
+            Instance.RegisterTransient(factory);
     }
 
 }

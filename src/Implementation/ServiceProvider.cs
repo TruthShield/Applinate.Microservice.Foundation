@@ -32,30 +32,20 @@ namespace Applinate
             return result;
         }
 
-        public static void RegisterSingleton<TAbstraction, TConcretion>()
-            where TAbstraction : class where TConcretion : class, TAbstraction =>
-            InstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>();
-
-        [Obsolete]
-        public static void RegisterSingleton<TAbstraction>(Func<TAbstraction> implementationFactory)
+        public static void RegisterSingleton<TAbstraction>(Func<TAbstraction> factory)
             where TAbstraction : class =>
-            InstanceRegistry.RegisterSingleton<TAbstraction>(implementationFactory);
+            InstanceRegistry.RegisterSingleton(factory);
 
-        public static void RegisterSingleton<TAbstraction, TConcretion>(TConcretion implementation)
-            where TAbstraction : class where TConcretion : class, TAbstraction =>
-            InstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>(s => implementation);
-
-        [Obsolete]
-        public static void RegisterTransient<TAbstraction>(Func<TAbstraction> implementationFactory)
+        public static void RegisterTransient<TAbstraction>(Func<TAbstraction> factory)
             where TAbstraction : class =>
-            InstanceRegistry.RegisterTransient<TAbstraction>(implementationFactory);
-
-        [Obsolete]
-        public static void RegisterTransient<TAbstraction, TConcretion>()
-            where TAbstraction : class where TConcretion : class, TAbstraction, new() =>
-            RegisterTransient<TAbstraction>(() => new TConcretion());
+            InstanceRegistry.RegisterTransient(factory);
 
         public static void SetServiceCollection(IServiceCollection services) =>
             ServiceCollection = services;
+
+        internal static void RegisterSingleton<TAbstraction, TConcretion>()
+            where TConcretion : TAbstraction, new()
+            where TAbstraction: class =>
+            RegisterSingleton<TAbstraction>(() => new TConcretion());
     }
 }

@@ -9,14 +9,8 @@ namespace Applinate
 
         private static IServiceCollection ServiceCollection { get; } = new ServiceCollection(); // UNDONE: not thread safe
 
-        void IInstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>() =>
-            ServiceCollection.AddSingleton<TAbstraction, TConcretion>();
-
         void IInstanceRegistry.RegisterSingleton<TAbstraction>(Func<TAbstraction> factory) =>
             ServiceCollection.AddSingleton(sp => factory());
-
-        void IInstanceRegistry.RegisterSingleton<TAbstraction, TConcretion>(Func<TAbstraction, TConcretion> factory) =>
-            ServiceCollection.AddSingleton(factory);
 
         void IInstanceRegistry.RegisterTransient<TAbstraction>(Func<TAbstraction> factory) =>
             ServiceCollection.AddTransient(sp => factory());
