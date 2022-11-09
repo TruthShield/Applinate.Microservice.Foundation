@@ -58,7 +58,7 @@ namespace Applinate
                 TRequest request,
                 CancellationToken cancellationToken)
                 where TRequest : class, IReturn<TResponse>
-                where TResponse : class, IHaveRequestStatus =>
+                where TResponse : class, IHaveResponseStatus =>
                 request.ExecuteAsync(cancellationToken);
 
             protected override object Invoke(MethodInfo targetMethod, object[] args)
@@ -141,7 +141,7 @@ namespace Applinate
                     throw new InvalidOperationException("bad 1");
                 }
 
-                if (!returnInnerType.IsAssignableTo(typeof(IHaveRequestStatus)))
+                if (!returnInnerType.IsAssignableTo(typeof(IHaveResponseStatus)))
                 {
                     throw new InvalidOperationException("bad 2");
                 }

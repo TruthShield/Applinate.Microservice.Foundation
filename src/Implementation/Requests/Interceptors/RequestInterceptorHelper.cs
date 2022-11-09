@@ -5,37 +5,37 @@ namespace Applinate
     using System.Diagnostics;
     using System.Reflection;
 
-    internal static class RequestInterceptorHelper<TRequest, TResult>
-        where TRequest : class, IReturn<TResult>
-        where TResult : class, IHaveRequestStatus
+    internal static class RequestInterceptorHelper<TRequest, TResponse>
+        where TRequest : class, IReturn<TResponse>
+        where TResponse : class, IHaveResponseStatus
     {
         private static readonly object _SyncLock = new();
 
-        private static InterceptorRecord<TRequest, TResult>[]? _ProxyTypes;
+        private static InterceptorRecord<TRequest, TResponse>[]? _ProxyTypes;
 
-        public static async Task<TResult> Execute(IRequestHandler<TRequest, TResult> command, TRequest arg, CancellationToken cancellationToken)
+        public static async Task<TResponse> Execute(IRequestHandler<TRequest, TResponse> command, TRequest request, CancellationToken cancellationToken)
         {
             var interceptorTypes = GetProxyTypes();
 
             if (!interceptorTypes.Any())
             {
-                return await command.ExecuteAsync(arg, cancellationToken).ConfigureAwait(false);
+                return await command.ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
             }
 
-            var cmd = new InterceptorBase<TRequest, TResult>(command.ExecuteAsync);
+            var cmd = new InterceptorBase<TRequest, TResponse>(command.ExecuteAsync);
 
             foreach (var p in interceptorTypes)
             {
                 cmd = p.GetInterceptor(cmd.ExecuteAsync);
             }
 
-            var result = await cmd.ExecuteAsync(arg, cancellationToken).ConfigureAwait(false);
+            var result = await cmd.ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
 
             return result;
         }
 
         [STAThread]
-        static InterceptorRecord<TRequest, TResult>[] GetProxyTypes()
+        static InterceptorRecord<TRequest, TResponse>[] GetProxyTypes()
         {
             if (_ProxyTypes is not null)
             {
@@ -51,12 +51,12 @@ namespace Applinate
 
                 var proxyQry =
                 from t in TypeRegistry.Types
-                where t.IsAssignableTo(typeof(RequestInterceptorBase<TRequest, TResult>)) &&
-                t != typeof(RequestInterceptorBase<TRequest, TResult>)
+                where t.IsAssignableTo(typeof(RequestInterceptorBase<TRequest, TResponse>)) &&
+                t != typeof(RequestInterceptorBase<TRequest, TResponse>)
                 let att = t.GetCustomAttribute<InterceptAttribute>()
                 let ordinal = att?.Ordinal ?? int.MaxValue
-                select new ProxyInterceptorRecord<TRequest, TResult>(ordinal, t)
-                    as InterceptorRecord<TRequest, TResult>;
+                select new ProxyInterceptorRecord<TRequest, TResponse>(ordinal, t)
+                    as InterceptorRecord<TRequest, TResponse>;
 
                 var factoryQry =
                     (from t in TypeRegistry.Types
@@ -64,8 +64,8 @@ namespace Applinate
                      t != typeof(InterceptorFactoryBase)
                      let att = t.GetCustomAttribute<InterceptAttribute>()
                      let ordinal = att?.Ordinal ?? int.MaxValue
-                     select new FactoryInterceptorRecord<TRequest, TResult>(ordinal, t) 
-                        as InterceptorRecord<TRequest, TResult>).ToArray();
+                     select new FactoryInterceptorRecord<TRequest, TResponse>(ordinal, t) 
+                        as InterceptorRecord<TRequest, TResponse>).ToArray();
 
                 _ProxyTypes = proxyQry.Union(factoryQry).OrderByDescending(x => x.Ordinal).ToArray();
 
@@ -73,29 +73,29 @@ namespace Applinate
             }
         }
 
-        private class FactoryInterceptorRecord<TRequest2, TResult2> : InterceptorRecord<TRequest2, TResult2>
-            where TRequest2 : class, IReturn<TResult2>
-            where TResult2 : class, IHaveRequestStatus
+        private class FactoryInterceptorRecord<TRequest2, TResponse2> : InterceptorRecord<TRequest2, TResponse2>
+            where TRequest2 : class, IReturn<TResponse2>
+            where TResponse2 : class, IHaveResponseStatus
         {
             public FactoryInterceptorRecord(int ordinal, Type type) : base(ordinal, type)
             {
             }
 
-            public override InterceptorBase<TRequest2, TResult2> GetInterceptor(ExecuteDelegate<TRequest2, TResult2> core)
+            public override InterceptorBase<TRequest2, TResponse2> GetInterceptor(ExecuteDelegate<TRequest2, TResponse2> core)
             {
-                return new InterceptorBase<TRequest2, TResult2>(async (a, r) => await Execute(core, a, r).ConfigureAwait(false));
+                return new InterceptorBase<TRequest2, TResponse2>(async (a, r) => await Execute(core, a, r).ConfigureAwait(false));
             }
 
-            private Task<TResult2?> Execute(ExecuteDelegate<TRequest2, TResult2> core, TRequest2 a, CancellationToken r)
+            private Task<TResponse2?> Execute(ExecuteDelegate<TRequest2, TResponse2> core, TRequest2 a, CancellationToken r)
             {
                 var instance = Activator.CreateInstance(Type) as InterceptorFactoryBase;
-                return instance?.ExecuteAsync(core, a, r) ?? Task.FromResult<TResult2>(default);
+                return instance?.ExecuteAsync(core, a, r) ?? Task.FromResult<TResponse2>(default);
             }
         }
 
-        private abstract class InterceptorRecord<TRequest2, TResult2>
-             where TRequest2 : class, IReturn<TResult2>
-             where TResult2 : class, IHaveRequestStatus
+        private abstract class InterceptorRecord<TRequest2, TResponse2>
+             where TRequest2 : class, IReturn<TResponse2>
+             where TResponse2 : class, IHaveResponseStatus
         {
             protected InterceptorRecord(int ordinal, Type type)
             {
@@ -107,18 +107,18 @@ namespace Applinate
             public Type Type { get; }
 
             [DebuggerHidden]
-            public abstract InterceptorBase<TRequest2, TResult2>? GetInterceptor(ExecuteDelegate<TRequest2, TResult2> core);
+            public abstract InterceptorBase<TRequest2, TResponse2>? GetInterceptor(ExecuteDelegate<TRequest2, TResponse2> core);
         }
 
-        private class ProxyInterceptorRecord<TRequest2, TResult2> : InterceptorRecord<TRequest2, TResult2>
-            where TRequest2 : class, IReturn<TResult2>
-            where TResult2 : class, IHaveRequestStatus
+        private class ProxyInterceptorRecord<TRequest2, TResponse2> : InterceptorRecord<TRequest2, TResponse2>
+            where TRequest2 : class, IReturn<TResponse2>
+            where TResponse2 : class, IHaveResponseStatus
         {
             public ProxyInterceptorRecord(int ordinal, Type type) : base(ordinal, type) { }
 
             [DebuggerHidden]
-            public override InterceptorBase<TRequest2, TResult2>? GetInterceptor(ExecuteDelegate<TRequest2, TResult2> core) => 
-                Activator.CreateInstance(Type, new[] { core }) as InterceptorBase<TRequest2, TResult2>;
+            public override InterceptorBase<TRequest2, TResponse2>? GetInterceptor(ExecuteDelegate<TRequest2, TResponse2> core) => 
+                Activator.CreateInstance(Type, new[] { core }) as InterceptorBase<TRequest2, TResponse2>;
         }
     }
 }

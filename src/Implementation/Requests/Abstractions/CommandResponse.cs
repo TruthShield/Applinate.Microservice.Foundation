@@ -1,17 +1,17 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
-    public sealed class CommandResponse: IHaveRequestStatus
+    public sealed class CommandResponse: IHaveResponseStatus
     {
-        public static readonly CommandResponse Success = new(RequestStatus.Success);
+        public static readonly CommandResponse Success = new(ResponseStatus.Success);
 
-        public CommandResponse(RequestStatus status)
+        public CommandResponse(ResponseStatus status)
         {
             Status = status; 
         }
 
-        public RequestStatus Status { get; init; }
+        public ResponseStatus Status { get; init; }
 
-        public static CommandResponse Failure(string str) => new(RequestStatus.Failure(str));
+        public static CommandResponse Failure(string str) => new(ResponseStatus.Failure(str));
     }
 }

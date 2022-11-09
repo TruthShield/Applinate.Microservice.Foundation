@@ -22,9 +22,9 @@ namespace Applinate.Foundation.Commands.Interceptors
                     { ServiceType.Integration, new[]{ ServiceType.Tool} }
                 });
 
-        public override Task<TResult> ExecuteAsync<TRequest, TResult>(
-            ExecuteDelegate<TRequest, TResult> next,
-            TRequest arg,
+        public override Task<TResponse> ExecuteAsync<TRequest, TResponse>(
+            ExecuteDelegate<TRequest, TResponse> next,
+            TRequest request,
             CancellationToken cancellationToken)
         {
             var currentServiceType = RequestContext.Current?.ServiceType ?? ServiceType.None;
@@ -38,7 +38,7 @@ namespace Applinate.Foundation.Commands.Interceptors
 
             if (_Allowed[currentServiceType].Contains(commandType))
             {
-                return next(arg, cancellationToken);
+                return next(request, cancellationToken);
             }
 
             var accepted = string.Join(", ", _Allowed[currentServiceType].Select(x => x.ToString()).ToArray());

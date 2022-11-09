@@ -2,12 +2,12 @@
 namespace Applinate
 {
     /// <summary>
-    /// This is a strutural constraint for <see cref="IReturn{TResult}"/> results.
+    /// This is a strutural constraint for <see cref="IReturn{TResponse}"/> results.
     ///
     /// There must ALWAYS be a status for commands or queries.
     /// </summary>
-    public interface IHaveRequestStatus
+    public interface IHaveResponseStatus
     {
-        RequestStatus Status { get; }
+        ResponseStatus Status { get; }
     }
 }

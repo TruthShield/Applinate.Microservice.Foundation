@@ -2,8 +2,8 @@
 namespace Applinate.Foundation.Test
 {
 
-    public class My_010_UnitTestResponse : IHaveRequestStatus
+    public class My_010_UnitTestResponse : IHaveResponseStatus
     {
-        public RequestStatus Status => throw new NotImplementedException();
+        public ResponseStatus Status => throw new NotImplementedException();
     }
 }

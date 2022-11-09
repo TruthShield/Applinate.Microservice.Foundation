@@ -4,56 +4,56 @@ namespace Applinate
 {
     using System.Diagnostics;
 
-    public class InterceptorBase<TRequest, TResult>
-        where TRequest : class, IReturn<TResult>
-        where TResult : class, IHaveRequestStatus
+    public class InterceptorBase<TRequest, TResponse>
+        where TRequest : class, IReturn<TResponse>
+        where TResponse : class, IHaveResponseStatus
     {
-        private readonly ExecuteDelegate<TRequest, TResult> _Core;
+        private readonly ExecuteDelegate<TRequest, TResponse> _Core;
 
         [DebuggerHidden]
-        public InterceptorBase(ExecuteDelegate<TRequest, TResult> core)
+        public InterceptorBase(ExecuteDelegate<TRequest, TResponse> core)
             => _Core = core;
 
         /// <summary>
         /// Execute as an asynchronous operation.
         /// </summary>
-        /// <param name="arg">The argument.</param>
+        /// <param name="request">The request.</param>
         /// <param name="cancellationToken">The cancellation token that can be used by other objects or threads to
         /// receive notice of cancellation.</param>
-        /// <returns>A Task&lt;TResult&gt; representing the asynchronous operation.</returns>
+        /// <returns>A Task&lt;TResponse&gt; representing the asynchronous operation.</returns>
         [DebuggerHidden]
-        public virtual async Task<TResult> ExecuteAsync(TRequest arg, CancellationToken cancellationToken)
+        public virtual async Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
         {
-            var newArg = await PreProcessAsync(arg).ConfigureAwait(false);
+            var newArg = await PreProcessAsync(request).ConfigureAwait(false);
             var result = await ExecuteCoreAsync(newArg, cancellationToken).ConfigureAwait(false);
             var newResult = await PostProcessAsync(result).ConfigureAwait(false);
             return newResult;
         }
 
         [DebuggerHidden]
-        private Task<TResult> ExecuteCoreAsync(TRequest arg, CancellationToken cancellationToken)
+        private Task<TResponse> ExecuteCoreAsync(TRequest request, CancellationToken cancellationToken)
         {
-            return _Core(arg, cancellationToken);
+            return _Core(request, cancellationToken);
         }
 
         /// <summary>
         /// A hook to pre-process the call.  Usually used for logging, tracing, or modifying the input argumment.
         /// 
         /// If you need to modify behavior use <see cref="ExecuteCoreAsync(TRequest, CancellationToken)"/>.        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns>Task&lt;TResult&gt;.</returns>
+        /// <param name="response">The result.</param>
+        /// <returns>Task&lt;TResponse&gt;.</returns>
         [DebuggerHidden]
-        protected virtual Task<TResult> PostProcessAsync(TResult result)
+        protected virtual Task<TResponse> PostProcessAsync(TResponse response)
         {
-            return Task.FromResult(result);
+            return Task.FromResult(response);
         }
 
         /// A hook to post-process the call.  Usually used for logging, tracing purposes, or modification of the output.
         /// If you need to modify behavior use <see cref="ExecuteCoreAsync(TRequest, CancellationToken)"/>.
         [DebuggerHidden]
-        protected virtual Task<TRequest> PreProcessAsync(TRequest arg)
+        protected virtual Task<TRequest> PreProcessAsync(TRequest request)
         {
-            return Task.FromResult(arg);
+            return Task.FromResult(request);
         }
     }
 }

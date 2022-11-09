@@ -26,14 +26,14 @@ namespace Applinate
             return $@"{ContextChangeType} {ServiceCallCount} {CommandType}";
         }
 
-        public static RequestContextChange Entry<TRequest, TResult>(int serviceCallCount)
-            where TRequest : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus =>
-            new(RequestContextChangeType.Entry, typeof(TRequest), typeof(TResult), serviceCallCount);
+        public static RequestContextChange Entry<TRequest, TResponse>(int serviceCallCount)
+            where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveResponseStatus =>
+            new(RequestContextChangeType.Entry, typeof(TRequest), typeof(TResponse), serviceCallCount);
 
-        public static RequestContextChange Exit<TRequest, TResult>(int serviceCallCount)
-            where TRequest : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus =>
-            new(RequestContextChangeType.Exit, typeof(TRequest), typeof(TResult), serviceCallCount);
+        public static RequestContextChange Exit<TRequest, TResponse>(int serviceCallCount)
+            where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveResponseStatus =>
+            new(RequestContextChangeType.Exit, typeof(TRequest), typeof(TResponse), serviceCallCount);
     }
 }

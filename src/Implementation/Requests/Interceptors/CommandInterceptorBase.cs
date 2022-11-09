@@ -17,19 +17,19 @@ namespace Applinate
         {
         }
 
-        public override Task<CommandResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken)
+        public override Task<CommandResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
         {
-            return base.ExecuteAsync(arg, cancellationToken);
+            return base.ExecuteAsync(request, cancellationToken);
         }
 
-        protected override Task<CommandResponse> PostProcessAsync(CommandResponse result)
+        protected override Task<CommandResponse> PostProcessAsync(CommandResponse response)
         {
-            return base.PostProcessAsync(result);
+            return base.PostProcessAsync(response);
         }
 
-        protected override Task<TRequest> PreProcessAsync(TRequest arg)
+        protected override Task<TRequest> PreProcessAsync(TRequest request)
         {
-            return base.PreProcessAsync(arg);
+            return base.PreProcessAsync(request);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    public class My_006_UnitTestCalculatorCommandResult : IHaveRequestStatus
+    public class My_006_UnitTestCalculatorCommandResult : IHaveResponseStatus
     {
-        public RequestStatus Status => throw new System.NotImplementedException();
+        public ResponseStatus Status => throw new System.NotImplementedException();
     }
 }

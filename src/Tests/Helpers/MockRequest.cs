@@ -10,13 +10,13 @@ namespace Applinate.Test
     /// Class MockCommand.
     /// </summary>
     /// <typeparam name="TRequest">The type of the t argument.</typeparam>
-    /// <typeparam name="TResult">The type of the t result.</typeparam>
-    public static class MockRequest<TRequest, TResult>
-        where TRequest : class, IReturn<TResult>
-        where TResult : class, IHaveRequestStatus
+    /// <typeparam name="TResponse">The type of the t result.</typeparam>
+    public static class MockRequest<TRequest, TResponse>
+        where TRequest : class, IReturn<TResponse>
+        where TResponse : class, IHaveResponseStatus
     {
-        private static readonly AsyncLocal<MockCommandExecutor<TRequest, TResult>> _Executor = new();
-        private static readonly MockCommandExecutor<TRequest, TResult> _GlobalExecutor = new();
+        private static readonly AsyncLocal<MockCommandExecutor<TRequest, TResponse>> _Executor = new();
+        private static readonly MockCommandExecutor<TRequest, TResponse> _GlobalExecutor = new();
 
         /// <summary>
         /// Gets a value indicating whether this instance is set.
@@ -44,20 +44,20 @@ namespace Applinate.Test
             _Executor.Value.Behavior = null;
         }
 
-        //internal static void SetGlobally<TRequest, TResult>(Func<TRequest, TResult> behavior)
-        //    where TRequest : class, IReturn<TResult>
-        //    where TResult : class
+        //internal static void SetGlobally<TRequest, TResponse>(Func<TRequest, TResponse> behavior)
+        //    where TRequest : class, IReturn<TResponse>
+        //    where TResponse : class
         //{
         //    _Executor.Value.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
         /// <summary>
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void Set(Func<TRequest, CancellationToken, Task<TResult>> behavior)
+        public static void Set(Func<TRequest, CancellationToken, Task<TResponse>> behavior)
         {
             if (_Executor.Value is null)
             {
-                _Executor.Value = new MockCommandExecutor<TRequest, TResult>();
+                _Executor.Value = new MockCommandExecutor<TRequest, TResponse>();
             }
 
             _Executor.Value.Behavior = behavior;
@@ -67,34 +67,34 @@ namespace Applinate.Test
         /// Sets the specified behavior for the duration and context of the test.
         /// </summary>
         /// <param name="behavior">The behavior.</param>
-        public static void SetForTestScope(Func<TRequest, TResult> behavior)
+        public static void SetForTestScope(Func<TRequest, TResponse> behavior)
         {
             if (_Executor.Value is null)
             {
-                _Executor.Value = new MockCommandExecutor<TRequest, TResult>();
+                _Executor.Value = new MockCommandExecutor<TRequest, TResponse>();
             }
 
             _Executor.Value.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
             // TODO: set commandhelper
         }
 
-        public static void SetGlobally(Func<TRequest, TResult> behavior)
+        public static void SetGlobally(Func<TRequest, TResponse> behavior)
         {
             _GlobalExecutor.Behavior = (arg, cancellationToken) => Task.FromResult(behavior(arg));
             // TODO: set commandhelper
         }
 
-        internal static Task<TResult> Execute(TRequest arg, CancellationToken cancellationToken)
+        internal static Task<TResponse> Execute(TRequest request, CancellationToken cancellationToken)
         {
             if (_Executor?.Value?.Behavior is not null)
             {
                 // TODO: throw if not set
-                return _Executor.Value.Behavior(arg, cancellationToken);
+                return _Executor.Value.Behavior(request, cancellationToken);
             }
 
             if (_GlobalExecutor.Behavior is not null)
             {
-                return _GlobalExecutor.Behavior(arg, cancellationToken);
+                return _GlobalExecutor.Behavior(request, cancellationToken);
             }
 
             throw new InvalidOperationException("mock behavior not set");

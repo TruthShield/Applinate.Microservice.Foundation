@@ -8,7 +8,7 @@
                         TaskContinuationOptions.None,
                         TaskScheduler.Default);
 
-        public static TResult RunSync<TResult>(Func<Task<TResult>> func)
+        public static TResponse RunSync<TResponse>(Func<Task<TResponse>> func)
             => _taskFactory
                 .StartNew(func)
                 .Unwrap()

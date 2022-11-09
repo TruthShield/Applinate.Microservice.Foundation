@@ -126,21 +126,21 @@ namespace Applinate
             public Type ImplementationType { get; }
             public Type ResultType { get; }
 
-            public IRequestHandler<TRequest1, TResult1> BuildRequestHandler<TRequest1, TResult1>()
-                where TRequest1 : class, IReturn<TResult1>
-                where TResult1 : class, IHaveRequestStatus
+            public IRequestHandler<TRequest1, TResponse1> BuildRequestHandler<TRequest1, TResponse1>()
+                where TRequest1 : class, IReturn<TResponse1>
+                where TResponse1 : class, IHaveResponseStatus
             {
                 if (typeof(TRequest1) != ArgType)
                 {
                     throw new ArgumentException("expecting type " + ArgType);
                 }
 
-                if (typeof(TResult1) != ResultType)
+                if (typeof(TResponse1) != ResultType)
                 {
                     throw new ArgumentException("expecting type " + ResultType);
                 }
 
-                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TRequest1, TResult1> ?? throw ExceptionFactory.UnexpectedNull();
+                return Activator.CreateInstance(ImplementationType) as IRequestHandler<TRequest1, TResponse1> ?? throw ExceptionFactory.UnexpectedNull();
             }
         }
 
@@ -155,15 +155,15 @@ namespace Applinate
             public Type ImplementationType { get; }
             public MethodInfo MethodInfo { get; }
 
-            public IRequestHandler<TRequest1, TResult1> BuildRequestHandler<TRequest1, TResult1>()
-                where TRequest1 : class, IReturn<TResult1>
-                where TResult1 : class, IHaveRequestStatus =>
-                new ServiceRequestHandlerMap<TRequest1, TResult1>(ImplementationType, MethodInfo);
+            public IRequestHandler<TRequest1, TResponse1> BuildRequestHandler<TRequest1, TResponse1>()
+                where TRequest1 : class, IReturn<TResponse1>
+                where TResponse1 : class, IHaveResponseStatus =>
+                new ServiceRequestHandlerMap<TRequest1, TResponse1>(ImplementationType, MethodInfo);
         }
 
         private class ServiceRequestHandlerMap<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
                     where TRequest : class, IReturn<TResponse>
-            where TResponse : class, IHaveRequestStatus
+            where TResponse : class, IHaveResponseStatus
         {
             public ServiceRequestHandlerMap(Type implementationType, MethodInfo methodInfo)
             {
@@ -174,12 +174,12 @@ namespace Applinate
             public Type ImplementationType { get; }
             public MethodInfo MethodInfo { get; }
 
-            public Task<TResponse> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default) =>
+            public Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default) =>
                 MethodInfo.Invoke(
                     Activator.CreateInstance(ImplementationType),
                     new object[]
                     {
-                        arg,
+                        request,
                         cancellationToken
                     }) as Task<TResponse> ?? throw new InvalidCastException();
         }

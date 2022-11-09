@@ -3,9 +3,9 @@
 namespace Applinate
 {
     [BypassSafetyChecks]
-    internal sealed class FaultGeneratingCommandExecutor<TRequest, TResult> : IRequestHandler<TRequest, TResult>
-        where TRequest : class, IReturn<TResult>
-        where TResult : class, IHaveRequestStatus
+    internal sealed class FaultGeneratingCommandExecutor<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+        where TRequest : class, IReturn<TResponse>
+        where TResponse : class, IHaveResponseStatus
     {
         private readonly Func<Exception> _ExceptionBuilder;
 
@@ -16,7 +16,7 @@ namespace Applinate
             _ExceptionBuilder = exceptionBuilder;
         }
 
-        public Task<TResult> ExecuteAsync(TRequest arg, CancellationToken cancellationToken = default)
+        public Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default)
         {
             throw _ExceptionBuilder();
         }
