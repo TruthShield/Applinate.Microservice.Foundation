@@ -1,4 +1,4 @@
 {
   "$schema": "./build.schema.json",
-  "Solution": "Applinate.Microservice.Foundation.sln"
+  "Solution": "Applinate.sln"
 }

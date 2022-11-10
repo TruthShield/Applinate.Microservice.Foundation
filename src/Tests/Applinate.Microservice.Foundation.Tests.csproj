@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Applinate.Microservice.InversionOfControl.Microsoft" Version="0.3.0" />
     <PackageReference Include="AsyncFixer" Version="1.6.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ioc\Applinate.Microservice.InversionOfControl.Microsoft.csproj" />
     <ProjectReference Include="..\Implementation\Applinate.Microservice.Foundation.csproj" />
   </ItemGroup>
 
