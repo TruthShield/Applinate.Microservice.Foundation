@@ -8,14 +8,14 @@ namespace Applinate.Foundation.Commands.Interceptors
     [Intercept(-1999999999)]
     internal class RequestContextUpdaterInterceptorFactory : InterceptorFactoryBase
     {
-        public override async Task<TResult> ExecuteAsync<TArg, TResult>(
-            ExecuteDelegate<TArg, TResult> next, 
-            TArg arg,
+        public override async Task<TResponse> ExecuteAsync<TRequest, TResponse>(
+            ExecuteDelegate<TRequest, TResponse> next, 
+            TRequest request,
             CancellationToken cancellationToken) 
         {
             var currentServiceType = RequestContext.Current.ServiceType;
-            var attribute          = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>();
-            var nextServiceType    = attribute?.CommandType ?? ServiceType.None;
+            var attribute          = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>();
+            var nextServiceType    = attribute?.ServiceType ?? ServiceType.None;
 
 
             int nextCallCount = RequestContext.Current.RequestCallCount + 1;
@@ -29,14 +29,14 @@ namespace Applinate.Foundation.Commands.Interceptors
             try
             {
                 InfrastructureEventSink.For.ScopedContextChange().Fire(
-                    RequestContextChange.Entry<TArg, TResult>(
+                    RequestContextChange.Entry<TRequest, TResponse>(
                         RequestContext.Current.RequestCallCount));
 
                 InfrastructureEventSink.For.AnyContextChange().Fire(
-                    RequestContextChange.Entry<TArg, TResult>(
+                    RequestContextChange.Entry<TRequest, TResponse>(
                         RequestContext.Current.RequestCallCount));
 
-                var result = await base.ExecuteAsync(next, arg, cancellationToken).ConfigureAwait(false);
+                var result = await base.ExecuteAsync(next, request, cancellationToken).ConfigureAwait(false);
                 return result ?? throw ExceptionFactory.UnexpectedNull();
             }
             catch
@@ -54,12 +54,12 @@ namespace Applinate.Foundation.Commands.Interceptors
                 };
 
                 InfrastructureEventSink.For.ScopedContextChange().Fire(
-                    RequestContextChange.Exit<TArg, TResult>(
+                    RequestContextChange.Exit<TRequest, TResponse>(
                         exitCallCount));
 
 
                 InfrastructureEventSink.For.AnyContextChange().Fire(
-                    RequestContextChange.Exit<TArg, TResult>(
+                    RequestContextChange.Exit<TRequest, TResponse>(
                         exitCallCount));
             }
 

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
-    using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     internal class ServiceProxyFactory:IInitialize
     {
@@ -10,14 +10,15 @@ namespace Applinate
 
         private static bool _Initialized = false;
 
-        internal static T Build<T>() => 
-            ServiceProxy<T>.Generate();
-
-        internal static void Register<T>() where T:class =>
-            ServiceProvider.RegisterSingleton<T>(x => Build<T>()) ;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void Register<TAbstraction>()
+            where TAbstraction:class =>
+            ServiceProvider.Register(
+                ServiceProxy<TAbstraction>.Generate,
+                InstanceLifetime.Singleton);
 
         [STAThread]
-        public void Initialize(IServiceCollection services, bool testing = false)
+        public void Initialize(bool testing = false)
         {
             if(_Initialized)
             {
@@ -44,20 +45,20 @@ namespace Applinate
             }        
         }
 
-        private class ServiceProxy<TInterface> : DispatchProxy
+        private class ServiceProxy<TAbstraction> : DispatchProxy
         {
             private static readonly Dictionary<MethodInfo, Func<object[], object>> _Execution = new();
 
             private static bool _Initialzed;
 
-            public static TInterface Generate() =>
-                Create<TInterface, ServiceProxy<TInterface>>();
+            public static TAbstraction Generate() =>
+                Create<TAbstraction, ServiceProxy<TAbstraction>>();
 
             public Task<TResponse> ExecuteAsync<TRequest, TResponse>(
                 TRequest request,
                 CancellationToken cancellationToken)
                 where TRequest : class, IReturn<TResponse>
-                where TResponse : class, IHaveRequestStatus =>
+                where TResponse : class, IHaveResponseStatus =>
                 request.ExecuteAsync(cancellationToken);
 
             protected override object Invoke(MethodInfo targetMethod, object[] args)
@@ -84,16 +85,16 @@ namespace Applinate
                     return;
                 }
 
-                var serviceAttribute = typeof(TInterface).GetCustomAttribute<ServiceAttribute>();
+                var serviceAttribute = typeof(TAbstraction).GetCustomAttribute<ServiceAttribute>();
 
                 if (serviceAttribute is null)
                 {
                     throw new InvalidOperationException("service type is not correct");
                 }
 
-                var serviceCommandType = serviceAttribute.CommandType;
+                var serviceCommandType = serviceAttribute.ServiceType;
 
-                var methods = typeof(TInterface).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+                var methods = typeof(TAbstraction).GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
                 foreach (var method in methods)
                 {
@@ -140,7 +141,7 @@ namespace Applinate
                     throw new InvalidOperationException("bad 1");
                 }
 
-                if (!returnInnerType.IsAssignableTo(typeof(IHaveRequestStatus)))
+                if (!returnInnerType.IsAssignableTo(typeof(IHaveResponseStatus)))
                 {
                     throw new InvalidOperationException("bad 2");
                 }

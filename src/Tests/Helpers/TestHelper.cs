@@ -25,8 +25,8 @@ namespace Applinate.Test
         /// </summary>
         /// <typeparam name="TRequest"></typeparam>
         /// <typeparam name="TResponse
-        public static void MockCommandForTestDuration<TArg>(Action<TArg> f)
-            where TArg : class, IReturn<CommandResponse> =>
+        public static void MockCommandForTestDuration<TRequest>(Action<TRequest> f)
+            where TRequest : class, IReturn<CommandResponse> =>
                 MockCommand.SetForTestScope(f);
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Applinate.Test
         /// this same setting for their mocked behavior.
         ///
         /// Most of the time, you'll want to use
-        /// <see cref="MockCommandForTestDuration{TArg}(Action{TArg})"/>
+        /// <see cref="MockCommandForTestDuration{TRequest}(Action{TRequest})"/>
         /// so that you can run tests in parallel.
         /// </summary>
         /// <typeparam name="TRequest">The type of the t argument.</typeparam>
@@ -78,7 +78,7 @@ namespace Applinate.Test
         /// <param name="f"></param>
         public static void MockRequestForTestDuration<TRequest, TResponse>(Func<TRequest, TResponse> f)
         where TRequest : class, IReturn<TResponse>
-        where TResponse : class, IHaveRequestStatus =>
+        where TResponse : class, IHaveResponseStatus =>
             MockRequest<TRequest, TResponse>.SetForTestScope(f);
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Applinate.Test
         /// If you use this method, you can not run tests in parallel because they will all share
         /// this same setting for their mocked behavior.
         ///
-        /// Most of the time, you'll want to use <see cref="MockRequestForTestDuration{TArg, TResult}(Func{TArg, TResult})"/>
+        /// Most of the time, you'll want to use <see cref="MockRequestForTestDuration{TRequest, TResponse}(Func{TRequest, TResponse})"/>
         /// so that you can run tests in parallel.
         /// </summary>
         /// <typeparam name="TRequest">The type of the t argument.</typeparam>
@@ -101,7 +101,7 @@ namespace Applinate.Test
         /// <param name="f">The f.</param>
         public static void MockRequestGlobally<TRequest, TResponse>(Func<TRequest, TResponse> f)
         where TRequest : class, IReturn<TResponse>
-        where TResponse : class, IHaveRequestStatus =>
+        where TResponse : class, IHaveResponseStatus =>
             MockRequest<TRequest, TResponse>.SetGlobally(f);
 
         public static void OnlyLoadReferencedAssemblies(bool value = true) =>

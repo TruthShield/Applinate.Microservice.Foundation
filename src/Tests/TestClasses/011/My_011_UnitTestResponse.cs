@@ -2,9 +2,9 @@
 namespace Applinate.Foundation.Test
 {
 
-    public class My_011_UnitTestResponse : IHaveRequestStatus
+    public class My_011_UnitTestResponse : IHaveResponseStatus
     {
-        public RequestStatus Status => RequestStatus.Success;
+        public ResponseStatus Status => ResponseStatus.Success;
 
         public int Value { get; set; }
     }

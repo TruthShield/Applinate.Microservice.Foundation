@@ -4,8 +4,8 @@ namespace Applinate
 {
     internal interface IRequestExecutor
     {
-        Task<TResult> ExecuteAsync<TArg, TResult>(TArg arg, CancellationToken cancellationToken = default)
-            where TArg : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus;
+        Task<TResponse> ExecuteAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default)
+            where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveResponseStatus;
     }
 }

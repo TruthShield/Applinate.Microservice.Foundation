@@ -5,17 +5,17 @@ namespace Applinate
     using System.Diagnostics;
     internal class RequestExecutor : IRequestExecutor
     {
-        public async Task<TResult> ExecuteAsync<TArg, TResult>(
-            TArg arg,
+        public async Task<TResponse> ExecuteAsync<TRequest, TResponse>(
+            TRequest request,
             CancellationToken cancellationToken = default)
-            where TArg : class, IReturn<TResult>
-            where TResult : class, IHaveRequestStatus
+            where TRequest : class, IReturn<TResponse>
+            where TResponse : class, IHaveResponseStatus
         {
-            var instance = GetHandler<TArg, TResult>();
+            var instance = GetHandler<TRequest, TResponse>();
 
-            var result = await RequestInterceptorHelper<TArg, TResult>.Execute(
+            var result = await RequestInterceptorHelper<TRequest, TResponse>.Execute(
                 instance,
-                arg,
+                request,
                 cancellationToken).ConfigureAwait(false);
 
             return result;
@@ -25,18 +25,18 @@ namespace Applinate
 
         private static NestedDictionary<Type, Type, IRequestHandlerBuilder[]> RequestHandlers => _RequestHandlers.Value;
 
-        private static IRequestHandler<TArg, TResult> GetHandler<TArg, TResult>()
-        where TArg : class, IReturn<TResult>
-        where TResult : class, IHaveRequestStatus
+        private static IRequestHandler<TRequest, TResponse> GetHandler<TRequest, TResponse>()
+        where TRequest : class, IReturn<TResponse>
+        where TResponse : class, IHaveResponseStatus
         {
-            var key1 = typeof(TArg);
-            var key2 = typeof(TResult);
+            var key1 = typeof(TRequest);
+            var key2 = typeof(TResponse);
 
             if (!RequestHandlers.ContainsKey(key1, key2))
             {
                 // fault on execution because the behavior may be overriden by an interceptor
-                return new FaultGeneratingCommandExecutor<TArg, TResult>(() =>
-                    ExceptionFactory.NoDefinedService<TArg, TResult>());
+                return new FaultGeneratingRequestExecutor<TRequest, TResponse>(() =>
+                    ExceptionFactory.NoDefinedService<TRequest, TResponse>());
             }
 
             var factory = RequestHandlers[key1][key2];
@@ -46,9 +46,9 @@ namespace Applinate
                 throw new InvalidOperationException("too many implementations"); // Undone: better error message here
             }
 
-            var instance = factory.First().BuildRequestHandler<TArg, TResult>();
+            var instance = factory.First().BuildRequestHandler<TRequest, TResponse>();
 
-            return instance ?? throw ExceptionFactory.NoDefinedService<TArg, TResult>();
+            return instance ?? throw ExceptionFactory.NoDefinedService<TRequest, TResponse>();
         }
     }
 }

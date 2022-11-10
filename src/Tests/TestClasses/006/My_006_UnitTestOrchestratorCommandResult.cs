@@ -1,8 +1,8 @@
 // Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate.Foundation.Test
 {
-    public class My_006_UnitTestOrchestratorCommandResult : IHaveRequestStatus
+    public class My_006_UnitTestOrchestratorCommandResult : IHaveResponseStatus
     {
-        public RequestStatus Status => throw new System.NotImplementedException();
+        public ResponseStatus Status => throw new System.NotImplementedException();
     }
 }

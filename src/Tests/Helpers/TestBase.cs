@@ -18,8 +18,6 @@ namespace Applinate.Test
                 InitializationProvider.Initialize(true);
 
                 TestHelper.SetRequestContext(serviceType);
-
-                ServiceProvider.RegisterSingleton<IRequestExecutor, RequestExecutor>();
             }
         }
     }

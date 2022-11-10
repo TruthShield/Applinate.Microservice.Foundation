@@ -3,9 +3,9 @@ namespace Applinate
 {
     using System.Collections.Immutable;
 
-    public record RequestStatus
+    public record ResponseStatus
     {
-        public RequestStatus(RequestStatusMessage[]?messages = null)
+        public ResponseStatus(RequestStatusMessage[]?messages = null)
         {
             Messages = (messages ?? Array.Empty<RequestStatusMessage>()).ToImmutableArray();
         }
@@ -15,9 +15,9 @@ namespace Applinate
 
         public ImmutableArray<RequestStatusMessage> Messages { get; init; }
 
-        public static readonly RequestStatus Success = new();
+        public static readonly ResponseStatus Success = new();
 
-        public static RequestStatus Build(
+        public static ResponseStatus Build(
             string[]? information = null,
             string[]? warnings = null,
             string[]? errors = null) => new(
@@ -26,6 +26,6 @@ namespace Applinate
                     .Union(errors?.Select(RequestStatusMessage.Error) ?? Enumerable.Empty<RequestStatusMessage>())
                     .ToArray());
 
-        public static RequestStatus Failure(params string[] errorMessages) => Build(null, null, errorMessages);
+        public static ResponseStatus Failure(params string[] errorMessages) => Build(null, null, errorMessages);
     }
 }

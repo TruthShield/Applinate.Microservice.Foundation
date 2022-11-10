@@ -22,9 +22,9 @@ namespace Applinate.Foundation.Commands.Interceptors
                     { ServiceType.Integration, new[]{ ServiceType.Tool} }
                 });
 
-        public override Task<TResult> ExecuteAsync<TArg, TResult>(
-            ExecuteDelegate<TArg, TResult> next,
-            TArg arg,
+        public override Task<TResponse> ExecuteAsync<TRequest, TResponse>(
+            ExecuteDelegate<TRequest, TResponse> next,
+            TRequest request,
             CancellationToken cancellationToken)
         {
             var currentServiceType = RequestContext.Current?.ServiceType ?? ServiceType.None;
@@ -34,17 +34,17 @@ namespace Applinate.Foundation.Commands.Interceptors
                 throw ExceptionFactory.CommandContextUnknown();
             }
 
-            var commandType = typeof(TArg).GetCustomAttribute<ServiceRequestAttribute>()?.CommandType ?? ServiceType.None;
+            var requestType = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>()?.ServiceType ?? ServiceType.None;
 
-            if (_Allowed[currentServiceType].Contains(commandType))
+            if (_Allowed[currentServiceType].Contains(requestType))
             {
-                return next(arg, cancellationToken);
+                return next(request, cancellationToken);
             }
 
             var accepted = string.Join(", ", _Allowed[currentServiceType].Select(x => x.ToString()).ToArray());
 
 
-            throw ExceptionFactory.InvalidCallingContext(currentServiceType, commandType, accepted);
+            throw ExceptionFactory.InvalidCallingContext(currentServiceType, requestType, accepted);
         }
 
 

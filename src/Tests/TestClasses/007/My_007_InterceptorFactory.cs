@@ -3,9 +3,12 @@ namespace Applinate.Foundation.Test
 {
     public class My_007_InterceptorFactory : InterceptorFactoryBase
     {
-        public override Task<TResult> ExecuteAsync<TArg, TResult>(ExecuteDelegate<TArg, TResult> next, TArg arg, CancellationToken cancellationToken)
+        public override Task<TResponse> ExecuteAsync<TRequest, TResponse>(
+            ExecuteDelegate<TRequest, TResponse> next, 
+            TRequest request, 
+            CancellationToken cancellationToken)
         {
-            var newArg = Update(arg);
+            var newArg = Update(request);
             return base.ExecuteAsync(next, newArg, cancellationToken);
         }
 
@@ -18,14 +21,14 @@ namespace Applinate.Foundation.Test
             };
         }
 
-        private static TArg Update<TArg>(TArg arg)
+        private static TRequest Update<TRequest>(TRequest request)
         {
-            if (arg is My_007_UnitTestCommand z)
+            if (request is My_007_UnitTestCommand z)
             {
-                return Update(z).As<TArg>();
+                return Update(z).As<TRequest>();
             }
 
-            return arg;
+            return request;
         }
     }
 }
