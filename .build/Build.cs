@@ -52,7 +52,7 @@ using JetBrains.Annotations;
     InvokedTargets = new[] { nameof(Pipeline) })]
 class Build : NukeBuild
 {
-    static string Version = new Version(0, 2, 0).ToString();
+    static string Version = new Version(0, 3, 1).ToString();
 
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
