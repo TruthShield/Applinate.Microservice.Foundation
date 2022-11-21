@@ -277,19 +277,20 @@ class Build : NukeBuild
        .OnlyWhenStatic(() => Configuration.Equals(Configuration.Release) && IsMaineBranch())
        .Executes(() =>
        {
-           GlobFiles(NugetDirectory, "*.nupkg")
-               .Where(x => !x.EndsWith("symbols.nupkg"))
-               .ForEach(x =>
-               {
-                   DotNetNuGetPush(s => s
-                       .SetTargetPath(x)
-                       .EnableSkipDuplicate()
-                       .SetSource(GithubNugetFeed)
-                       .SetApiKey(GitHubActions.Token)
-                       .EnableSkipDuplicate()
-                   );
+           // TODO: finish publishing automation
+           //GlobFiles(NugetDirectory, "*.nupkg")
+           //    .Where(x => !x.EndsWith("symbols.nupkg"))
+           //    .ForEach(x =>
+           //    {
+           //        DotNetNuGetPush(s => s
+           //            .SetTargetPath(x)
+           //            .EnableSkipDuplicate()
+           //            .SetSource(GithubNugetFeed)
+           //            .SetApiKey(GitHubActions.Token)
+           //            .EnableSkipDuplicate()
+           //        );
 
-               });
+           //    });
        });
 
     public bool IsOnDevelopBranch() => 
