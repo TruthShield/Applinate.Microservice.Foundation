@@ -20,8 +20,7 @@ namespace Applinate.Foundation.Commands.Interceptors
 
             int nextCallCount = RequestContext.Current.RequestCallCount + 1;
             var entry = RequestContext.Current = RequestContext.Current with
-            {
-                
+            {                
                 ServiceType = nextServiceType,
                 RequestCallCount = nextCallCount
             };

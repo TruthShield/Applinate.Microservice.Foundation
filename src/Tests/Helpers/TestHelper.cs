@@ -4,6 +4,7 @@ namespace Applinate.Test
 {
     using Microsoft.Extensions.Primitives;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Collections.ObjectModel;
 
     /// <summary>
@@ -142,6 +143,6 @@ namespace Applinate.Test
                     appContext            : new AppContextKey(SequentialGuid.NewGuid(), 0, 0, 1),
                     requestCallCount      : RequestContext.Current.RequestCallCount,
                     decoratorCallCount    : RequestContext.Current.DecoratorCallCount,
-                    metadata              : new ReadOnlyDictionary<string, StringValues>(md));
+                    metadata              : md.ToImmutableDictionary());
     }
 }

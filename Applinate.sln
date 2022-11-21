@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Applinate.Microservice.Foun
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Applinate.Microservice.Foundation.Tests", "src\Tests\Applinate.Microservice.Foundation.Tests.csproj", "{14B53A99-C731-4F96-A91B-0B85ED185A62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Applinate.Microservice.Foundation.Internals", "src\Internals\Applinate.Microservice.Foundation.Internals.csproj", "{C58B02CA-6C82-468C-AC78-CB5AD795173E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{14B53A99-C731-4F96-A91B-0B85ED185A62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14B53A99-C731-4F96-A91B-0B85ED185A62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14B53A99-C731-4F96-A91B-0B85ED185A62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C58B02CA-6C82-468C-AC78-CB5AD795173E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C58B02CA-6C82-468C-AC78-CB5AD795173E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C58B02CA-6C82-468C-AC78-CB5AD795173E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C58B02CA-6C82-468C-AC78-CB5AD795173E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4DAEFC81-FB5D-42DB-AE2C-34F1F9E9BD50} = {07680DA4-0D20-429D-97C5-CE782B7A910B}
 		{14B53A99-C731-4F96-A91B-0B85ED185A62} = {07680DA4-0D20-429D-97C5-CE782B7A910B}
+		{C58B02CA-6C82-468C-AC78-CB5AD795173E} = {07680DA4-0D20-429D-97C5-CE782B7A910B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74E8EC11-F06C-4224-92D8-A41B16D3853A}
