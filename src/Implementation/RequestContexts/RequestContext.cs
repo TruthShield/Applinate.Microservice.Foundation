@@ -3,6 +3,7 @@ namespace Applinate
 {
     using Microsoft.Extensions.Primitives;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Collections.ObjectModel;
 
     /// <summary>
@@ -25,20 +26,11 @@ namespace Applinate
             decoratorCallCount : 0,
             metadata           : BuildMetadata());
 
-        private static ReadOnlyDictionary<string, StringValues> BuildMetadata(IDictionary<string, StringValues>? metadata = null)
-        {
-            return new ReadOnlyDictionary<string, StringValues>(metadata ?? new Dictionary<string, StringValues>(StringComparer.Ordinal));
-        }
+        private static ImmutableDictionary<string, StringValues> BuildMetadata(
+            IDictionary<string, StringValues>? metadata = null) => 
+                metadata?.ToImmutableDictionary() ?? 
+                new Dictionary<string, StringValues>(StringComparer.Ordinal).ToImmutableDictionary();
 
-        private class ServiceContextWrapper { public RequestContext RequestContext; }
-
-        /// wrapping the Immutable ServiceContext value in a mutable wrapper class instance which internal AsyncLocal stores,
-        /// so changes are done to the wrapper, not the immutable Stext.  This workaround is for maintaining a reference
-        /// to the same ServiceContext on both async context entry and exit.
-        /// NOTE: This structure only works with single linear async strand(flow) like a "logical thread"
-        /// as it uses the mutable value, it should not be transacted from multi-threaded child callers, such as
-        /// forking sub-tasks
-        private static readonly AsyncLocal<ServiceContextWrapper> _Current = new AsyncLocal<ServiceContextWrapper>();
 
         public RequestContext(
             ServiceType currentServiceType,
@@ -47,7 +39,7 @@ namespace Applinate
             AppContextKey appContext,
             int requestCallCount                                = 0,
             int decoratorCallCount                              = 0,
-            IReadOnlyDictionary<string, StringValues>? metadata = null,
+            IImmutableDictionary<string, StringValues>? metadata = null,
             SequentialGuid? userProfileId                       = null)
         {
             ServiceType               = currentServiceType;
@@ -61,10 +53,20 @@ namespace Applinate
             UserProfileId             = userProfileId         ?? SequentialGuid.Empty;
         }
 
-        public static RequestContext Current
+        private class ServiceContextWrapper { public RequestContext RequestContext; }
+
+        /// wrapping the Immutable ServiceContext value in a mutable wrapper class instance which internal AsyncLocal stores,
+        /// so changes are done to the wrapper, not the immutable Stext.  This workaround is for maintaining a reference
+        /// to the same ServiceContext on both async context entry and exit.
+        /// NOTE: This structure only works with single linear async strand(flow) like a "logical thread"
+        /// as it uses the mutable value, it should not be transacted from multi-threaded child callers, such as
+        /// forking sub-tasks
+        private static readonly AsyncLocal<ServiceContextWrapper> _Current = new AsyncLocal<ServiceContextWrapper>();
+
+        internal static RequestContext Current
         {
             get => _Current?.Value?.RequestContext ?? RequestContext.Empty;
-            internal set
+            set
             {
                 if (_Current.Value is null)
                 {
@@ -76,16 +78,14 @@ namespace Applinate
             }
         }
 
-        public AppContextKey AppContextKey                         { get; init; }
-        public SequentialGuid ConversationId                       { get; init; }
-        public int DecoratorCallCount                              { get; init; }
-        public ServiceType ServiceType                             { get; init; }
-        public IReadOnlyDictionary<string, StringValues> Metadata  { get; init; }
-        public int RequestCallCount                                { get; init; }
-        public SequentialGuid SessionId { get; init; }
-        public SequentialGuid UserProfileId { get; init; }
+        public AppContextKey AppContextKey                          { get; init; }
+        public SequentialGuid ConversationId                        { get; init; }
+        public int DecoratorCallCount                               { get; init; }
+        public ServiceType ServiceType                              { get; init; }
+        public IImmutableDictionary<string, StringValues> Metadata  { get; init; }
+        public int RequestCallCount                                 { get; init; }
+        public SequentialGuid SessionId                             { get; init; }
+        public SequentialGuid UserProfileId                         { get; init; }
 
-        public static void SetAsClient() =>
-            Current = Current with { ServiceType = ServiceType.Client };
     }
 }

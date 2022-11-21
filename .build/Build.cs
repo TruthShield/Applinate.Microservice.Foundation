@@ -52,7 +52,7 @@ using JetBrains.Annotations;
     InvokedTargets = new[] { nameof(Pipeline) })]
 class Build : NukeBuild
 {
-    static string Version = new Version(0, 3, 1).ToString();
+    static string Version = new Version(0, 4, 0).ToString();
 
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
@@ -231,6 +231,26 @@ class Build : NukeBuild
       {
           DotNetPack(s => s
             .SetProject(Solution.GetProject("Applinate.Microservice.Foundation"))
+            .SetConfiguration(Configuration)
+            .EnableNoBuild()
+            .EnableNoRestore()
+            .SetVersion(Version)
+            .SetAssemblyVersion(Version)
+            .SetFileVersion(Version)
+            .SetInformationalVersion(Version)
+            //.SetCopyright(Copyright) // TODO: use copyright
+            //.SetVersion(GitVersion.NuGetVersionV2) // TODO: use gitversion 
+            //.SetAssemblyVersion(GitVersion.AssemblySemVer)
+            //.SetInformationalVersion(GitVersion.InformationalVersion)
+            //.SetFileVersion(GitVersion.AssemblySemFileVer)
+            .SetPackageTags("microservice cqrs tdd bdd framework applinate productivity solid")
+            .SetIncludeSymbols(false)
+            .SetNoDependencies(true)
+            .SetOutputDirectory(NugetDirectory)
+            );
+
+          DotNetPack(s => s
+            .SetProject(Solution.GetProject("Applinate.Microservice.Foundation.Internals"))
             .SetConfiguration(Configuration)
             .EnableNoBuild()
             .EnableNoRestore()

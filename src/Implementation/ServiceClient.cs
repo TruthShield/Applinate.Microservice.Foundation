@@ -1,5 +1,6 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 using Microsoft.Extensions.Primitives;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
@@ -29,8 +30,6 @@ namespace Applinate
             AppContextKey appContext, 
             IDictionary<string, StringValues>? metadata = null)
         {
-            /* todo; get all ambient context stuff necessasry for dispatching */
-
             Context = new RequestContext(
                 currentServiceType : ServiceType.Client,
                 sessionId          : Guid.NewGuid(),
@@ -39,7 +38,7 @@ namespace Applinate
                 requestCallCount   : 0,
                 decoratorCallCount : 0,
                 userProfileId      : userProfileId,
-                metadata           : BuildMetadata(metadata));               
+                metadata           : (metadata ?? new Dictionary<string, StringValues>()).ToImmutableDictionary());               
         }
 
         /// <summary>
@@ -51,12 +50,7 @@ namespace Applinate
                 with
                 { ConversationId = Guid.NewGuid() }
                 with
-                { Metadata = BuildMetadata(metadata) };
-
-        private static IReadOnlyDictionary<string, StringValues> BuildMetadata(IDictionary<string, StringValues>? metadata) =>
-            new ReadOnlyDictionary<string, StringValues>(
-                metadata ?? 
-                new Dictionary<string, StringValues>(StringComparer.Ordinal));
+                { Metadata = (metadata ?? new Dictionary<string, StringValues>()).ToImmutableDictionary() };
 
         public RequestContext Context { get; }
     }
