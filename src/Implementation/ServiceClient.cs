@@ -28,9 +28,9 @@ namespace Applinate
         public ServiceClient(
             Guid userProfileId,
             AppContextKey appContext, 
-            IDictionary<string, StringValues>? metadata = null)
+            IDictionary<string, string>? metadata = null)
         {
-            Context = new RequestContext(
+            Context = new(
                 currentServiceType : ServiceType.Client,
                 sessionId          : Guid.NewGuid(),
                 conversationId     : Guid.NewGuid(),
@@ -38,19 +38,19 @@ namespace Applinate
                 requestCallCount   : 0,
                 decoratorCallCount : 0,
                 userProfileId      : userProfileId,
-                metadata           : (metadata ?? new Dictionary<string, StringValues>()).ToImmutableDictionary());               
+                metadata           : (metadata ?? new Dictionary<string, string>()).ToImmutableDictionary());               
         }
 
         /// <summary>
         /// Sets the context needed to send a command and starts a new conversation.
         /// </summary>
-        public void StartNewConversation(IDictionary<string, StringValues>? metadata = null) => 
-            RequestContext.Current =
+        public void StartNewConversation(IDictionary<string, string>? metadata = null) => 
+            RequestContextProvider.Instance =
                 Context
                 with
                 { ConversationId = Guid.NewGuid() }
                 with
-                { Metadata = (metadata ?? new Dictionary<string, StringValues>()).ToImmutableDictionary() };
+                { Metadata = (metadata ?? new Dictionary<string, string>()).ToImmutableDictionary() };
 
         public RequestContext Context { get; }
     }

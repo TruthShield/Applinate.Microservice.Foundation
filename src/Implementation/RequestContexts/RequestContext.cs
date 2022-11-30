@@ -1,91 +1,62 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
-    using Microsoft.Extensions.Primitives;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Collections.ObjectModel;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Class RequestContext. This class cannot be inherited.
     ///
     /// This is the ambient context for the request that holds all the contextual information
     /// about the originating call and execution state.
-    ///
-    /// Implements the <see cref="System.IEquatable{Applinate.RequestContext}" />
     /// </summary>
-    /// <seealso cref="System.IEquatable{Applinate.RequestContext}" />
+    [DataContract]
     public sealed record RequestContext
     {
         public static readonly RequestContext Empty = new(
-            currentServiceType : ServiceType.None,
-            sessionId          : SequentialGuid.Empty,
-            conversationId     : SequentialGuid.Empty,
-            appContext         : AppContextKey.Empty,
-            requestCallCount   : 0,
-            decoratorCallCount : 0,
-            metadata           : BuildMetadata());
+            currentServiceType: ServiceType.None,
+            sessionId: SequentialGuid.Empty,
+            conversationId: SequentialGuid.Empty,
+            appContext: AppContextKey.Empty,
+            requestCallCount: 0,
+            decoratorCallCount: 0,
+            metadata: BuildMetadata());
 
-        private static ImmutableDictionary<string, StringValues> BuildMetadata(
-            IDictionary<string, StringValues>? metadata = null) => 
-                metadata?.ToImmutableDictionary() ?? 
-                new Dictionary<string, StringValues>(StringComparer.Ordinal).ToImmutableDictionary();
+        private static ImmutableDictionary<string, string> BuildMetadata(
+            IDictionary<string, string>? metadata = null) =>
+                metadata?.ToImmutableDictionary() ??
+                new Dictionary<string, string>(StringComparer.Ordinal).ToImmutableDictionary();
 
-
+        [System.Text.Json.Serialization.JsonConstructor]
+        [Newtonsoft.Json.JsonConstructor]
         public RequestContext(
             ServiceType currentServiceType,
             SequentialGuid sessionId,
             SequentialGuid conversationId,
             AppContextKey appContext,
-            int requestCallCount                                = 0,
-            int decoratorCallCount                              = 0,
-            IImmutableDictionary<string, StringValues>? metadata = null,
-            SequentialGuid? userProfileId                       = null)
+            int requestCallCount = 0,
+            int decoratorCallCount = 0,
+            IImmutableDictionary<string, string>? metadata = null,
+            SequentialGuid? userProfileId = null)
         {
-            ServiceType               = currentServiceType;
-
-            SessionId                 = sessionId;
-            ConversationId            = conversationId;
-            AppContextKey             = appContext;
-            RequestCallCount          = requestCallCount;
-            DecoratorCallCount        = decoratorCallCount;
-            Metadata                  = metadata              ?? BuildMetadata();
-            UserProfileId             = userProfileId         ?? SequentialGuid.Empty;
+            ServiceType = currentServiceType;
+            SessionId = sessionId;
+            ConversationId = conversationId;
+            AppContextKey = appContext;
+            RequestCallCount = requestCallCount;
+            DecoratorCallCount = decoratorCallCount;
+            Metadata = metadata ?? BuildMetadata();
+            UserProfileId = userProfileId ?? SequentialGuid.Empty;
         }
 
-        private class ServiceContextWrapper { public RequestContext RequestContext; }
-
-        /// wrapping the Immutable ServiceContext value in a mutable wrapper class instance which internal AsyncLocal stores,
-        /// so changes are done to the wrapper, not the immutable Stext.  This workaround is for maintaining a reference
-        /// to the same ServiceContext on both async context entry and exit.
-        /// NOTE: This structure only works with single linear async strand(flow) like a "logical thread"
-        /// as it uses the mutable value, it should not be transacted from multi-threaded child callers, such as
-        /// forking sub-tasks
-        private static readonly AsyncLocal<ServiceContextWrapper> _Current = new AsyncLocal<ServiceContextWrapper>();
-
-        internal static RequestContext Current
-        {
-            get => _Current?.Value?.RequestContext ?? RequestContext.Empty;
-            set
-            {
-                if (_Current.Value is null)
-                {
-                    _Current.Value = new ServiceContextWrapper() { RequestContext = value };
-                    return;
-                }
-
-                _Current.Value.RequestContext = value;
-            }
-        }
-
-        public AppContextKey AppContextKey                          { get; init; }
-        public SequentialGuid ConversationId                        { get; init; }
-        public int DecoratorCallCount                               { get; init; }
-        public ServiceType ServiceType                              { get; init; }
-        public IImmutableDictionary<string, StringValues> Metadata  { get; init; }
-        public int RequestCallCount                                 { get; init; }
-        public SequentialGuid SessionId                             { get; init; }
-        public SequentialGuid UserProfileId                         { get; init; }
-
+        [DataMember] public AppContextKey AppContextKey { get; init; }
+        [DataMember] public SequentialGuid ConversationId { get; init; }
+        [DataMember] public int DecoratorCallCount { get; init; }
+        [DataMember] public ServiceType ServiceType { get; init; }
+        [DataMember] public IImmutableDictionary<string, string> Metadata { get; init; }
+        [DataMember] public int RequestCallCount { get; init; }
+        [DataMember] public SequentialGuid SessionId { get; init; }
+        [DataMember] public SequentialGuid UserProfileId { get; init; }
     }
 }

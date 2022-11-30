@@ -19,7 +19,7 @@ namespace Applinate
                 }
 
                 // TDOO: look into removing internals visible to and factor the code to move the appropriate functionality to the right places (the code below is too tightly coupled to Applinate internals)
-                Applinate.RequestContext.Current = Applinate.RequestContext.Current with { ServiceType = ServiceType.Orchestration };
+                RequestContextProvider.Instance = RequestContextProvider.Instance with { ServiceType = ServiceType.Orchestration };
 
                 RegisterServiceFactories();
 
@@ -34,7 +34,7 @@ namespace Applinate
             }
             finally
             {
-                Applinate.RequestContext.Current = Applinate.RequestContext.Current with { ServiceType = ServiceType.None };
+                RequestContextProvider.Instance = RequestContextProvider.Instance with { ServiceType = ServiceType.None };
             }
         }
 
@@ -44,12 +44,28 @@ namespace Applinate
 
             if(! factories.Any())
             {
-                throw new InvalidOperationException("no available service factory");
+                throw new InvalidOperationException(@$"
+No Inversion Of Control implementation has been registered.
+
+To fix this, you have to provide a class that implements {nameof(IInstanceRegistry)}
+that maps to the IoC (Inversion of Control) framework you would like to use.
+
+You can create your own or use a NuGet package like 
+Applinate.Microservice.InversionOfControl.Microsoft
+");
             }
 
             if(factories.Skip(1).Any())
             {
-                throw new InvalidOperationException("too many service factories");
+                throw new InvalidOperationException(@$"
+Too many Inversion Of Control implementation have been registered.
+
+To fix this, you have to provide a single class that implements {nameof(IInstanceRegistry)}
+that maps to the IoC (Inversion of Control) framework you would like to use.
+
+You can create your own or use a NuGet package like 
+Applinate.Microservice.InversionOfControl.Microsoft
+");
             }
 
             InstanceRegistry.Instance = Activator.CreateInstance(factories.First()) as IInstanceRegistry ?? throw new InvalidOperationException("not a IServiceFactory"); // note: should not throw

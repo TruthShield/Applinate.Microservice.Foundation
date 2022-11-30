@@ -13,13 +13,12 @@ namespace Applinate.Foundation.Commands.Interceptors
             TRequest request,
             CancellationToken cancellationToken) 
         {
-            var currentServiceType = RequestContext.Current.ServiceType;
+            var currentServiceType = RequestContextProvider.Instance.ServiceType;
             var attribute          = typeof(TRequest).GetCustomAttribute<ServiceRequestAttribute>();
             var nextServiceType    = attribute?.ServiceType ?? ServiceType.None;
+            int nextCallCount      = RequestContextProvider.Instance.RequestCallCount + 1;
 
-
-            int nextCallCount = RequestContext.Current.RequestCallCount + 1;
-            var entry = RequestContext.Current = RequestContext.Current with
+            var entry = RequestContextProvider.Instance = RequestContextProvider.Instance with
             {                
                 ServiceType = nextServiceType,
                 RequestCallCount = nextCallCount
@@ -29,11 +28,11 @@ namespace Applinate.Foundation.Commands.Interceptors
             {
                 InfrastructureEventSink.For.ScopedContextChange().Fire(
                     RequestContextChange.Entry<TRequest, TResponse>(
-                        RequestContext.Current.RequestCallCount));
+                        RequestContextProvider.Instance.RequestCallCount));
 
                 InfrastructureEventSink.For.AnyContextChange().Fire(
                     RequestContextChange.Entry<TRequest, TResponse>(
-                        RequestContext.Current.RequestCallCount));
+                        RequestContextProvider.Instance.RequestCallCount));
 
                 var result = await base.ExecuteAsync(next, request, cancellationToken).ConfigureAwait(false);
                 return result ?? throw ExceptionFactory.UnexpectedNull();
@@ -44,9 +43,9 @@ namespace Applinate.Foundation.Commands.Interceptors
             }
             finally
             {
-                int exitCallCount = RequestContext.Current.RequestCallCount + 1;
+                int exitCallCount = RequestContextProvider.Instance.RequestCallCount + 1;
 
-                RequestContext.Current = RequestContext.Current with
+                RequestContextProvider.Instance = RequestContextProvider.Instance with
                 {
                     ServiceType = currentServiceType,
                     RequestCallCount = exitCallCount
@@ -56,15 +55,10 @@ namespace Applinate.Foundation.Commands.Interceptors
                     RequestContextChange.Exit<TRequest, TResponse>(
                         exitCallCount));
 
-
                 InfrastructureEventSink.For.AnyContextChange().Fire(
                     RequestContextChange.Exit<TRequest, TResponse>(
                         exitCallCount));
             }
-
-            
         }
     }
-
-
 }

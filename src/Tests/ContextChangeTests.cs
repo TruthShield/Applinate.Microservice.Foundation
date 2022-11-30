@@ -22,7 +22,7 @@ namespace Applinate.Foundation.Test
                 PreNumber = 2,
             };
 
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Orchestration);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Orchestration);
 
             var contextChangeHit = 0;
 
@@ -34,10 +34,10 @@ namespace Applinate.Foundation.Test
                 switch (contextChangeHit)
                 {
                     case 1:
-                        RequestContext.Current.ServiceType.Should().Be(ServiceType.Integration, "access entry");
+                        RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Integration, "access entry");
                         break;
                     case 2:
-                        RequestContext.Current.ServiceType.Should().Be(ServiceType.Orchestration, "manager exit");
+                        RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Orchestration, "manager exit");
                         break;
                     default:
                         true.Should().BeFalse("this should not get hit... there are only 2 changes ");
@@ -51,7 +51,7 @@ namespace Applinate.Foundation.Test
 
             contextChangeHit.Should().Be(2);
 
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Orchestration);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Orchestration);
         }
 
         [Fact()]
@@ -64,7 +64,7 @@ namespace Applinate.Foundation.Test
                 PreNumber = 2,
             };
 
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Orchestration);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Orchestration);
 
             var contextChangeHit = 0;
 
@@ -76,7 +76,7 @@ namespace Applinate.Foundation.Test
                 switch (contextChangeHit)
                 {
                     case 1:
-                        RequestContext.Current.ServiceType.Should().Be(ServiceType.Integration, "access entry");
+                        RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Integration, "access entry");
                         throw new InvalidOperationException("test exception to check flow when a fault occurrs in the child");
                     default:
                         break;
@@ -90,7 +90,7 @@ namespace Applinate.Foundation.Test
             }
             catch { }
 
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Orchestration);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Orchestration);
         }
     }
 }

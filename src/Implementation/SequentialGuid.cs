@@ -1,12 +1,10 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
+    using Newtonsoft.Json;
     using System.Buffers.Binary;
-    using System.Buffers.Text;
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Text;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// <see cref="SequentialGuid"/> generates sequential unique identifiers that are 128-bit (16-bytes)
@@ -71,7 +69,10 @@ namespace Applinate
     /// Guid id = SequentialGuid.NewGuid();
     /// </code>
     /// </summary>
-    public struct SequentialGuid : IEqualityComparer<SequentialGuid>, IEquatable<SequentialGuid>
+    [DataContract]
+    public struct SequentialGuid :
+        IEqualityComparer<SequentialGuid>,
+        IEquatable<SequentialGuid>
     {
         public static readonly SequentialGuid Empty = SequentialGuid.From(0);
 
@@ -85,11 +86,20 @@ namespace Applinate
         private static readonly DateTime MinDateTimeValue = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         private static DateTime lastValue = DateTime.MinValue;
 
+        [JsonConstructor]
         internal SequentialGuid(Guid guid)
         {
             Guid = guid;
         }
 
+        //internal SequentialGuid(
+        //    SerializationInfo info,
+        //    StreamingContext context)
+        //{
+        //    Guid = (Guid)info.GetValue(nameof(Guid), typeof(Guid));
+        //}
+
+        [DataMember]
         private Guid Guid { get; }
 
         public static SequentialGuid From(int value)
@@ -155,6 +165,13 @@ namespace Applinate
 
         public override int GetHashCode() => Guid.GetHashCode();
 
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(this.Guid), this.Guid);
+        }
+
+        public Guid ToGuid() => this;
+
         public override string ToString()
         {
             return Guid.ToString();
@@ -211,7 +228,5 @@ namespace Applinate
             BinaryPrimitives.WriteInt64BigEndian(msBytes, ms);
             msBytes[RemainingBytesFromInt64..].CopyTo(destination);
         }
-
-        public Guid ToGuid() => this;
     }
 }

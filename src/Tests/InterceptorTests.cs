@@ -24,11 +24,11 @@ namespace Applinate.Foundation.Test
 
             ServiceClient c = new ServiceClient(Guid.NewGuid(), new(Guid.NewGuid(), 1,2,3));
             c.StartNewConversation();
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Client);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Client);
 
             var result = await new My_006_UnitTestOrchestratorCommand().ExecuteAsync();
 
-            RequestContext.Current.ServiceType.Should().Be(ServiceType.Client);
+            RequestContextProvider.Instance.ServiceType.Should().Be(ServiceType.Client);
 
             queue.Count().Should().Be(6);
             queue.Where(x => x.ContextChangeType == RequestContextChangeType.Entry).Count().Should().Be(3, "three service entries");

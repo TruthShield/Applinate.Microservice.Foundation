@@ -1,9 +1,7 @@
 ﻿// Copyright (c) TruthShield, LLC. All rights reserved.
 namespace Applinate
 {
-    using Microsoft.Extensions.Primitives;
     using Newtonsoft.Json;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
 
     /// <summary>
@@ -17,20 +15,84 @@ namespace Applinate
     /// <seealso cref="System.IEquatable{Applinate.RequestContext}" />
     public static class RequestContextProvider
     {
-        public static AppContextKey AppContextKey                         => RequestContext.Current.AppContextKey;
-        public static SequentialGuid ConversationId                       => RequestContext.Current.ConversationId;
-        public static int DecoratorCallCount                              => RequestContext.Current.DecoratorCallCount;
-        public static ServiceType ServiceType                             => RequestContext.Current.ServiceType;
-        public static IImmutableDictionary<string, StringValues> Metadata => RequestContext.Current.Metadata;
-        public static int RequestCallCount                                => RequestContext.Current.RequestCallCount;
-        public static SequentialGuid SessionId                            => RequestContext.Current.SessionId;
-        public static SequentialGuid UserProfileId                        => RequestContext.Current.UserProfileId;
+        public static AppContextKey AppContextKey                   => Instance.AppContextKey;
+        public static SequentialGuid ConversationId                 => Instance.ConversationId;
+        public static int DecoratorCallCount                        => Instance.DecoratorCallCount;
+        public static IImmutableDictionary<string, string> Metadata => Instance.Metadata;
+        public static int RequestCallCount                          => Instance.RequestCallCount;
+        public static ServiceType ServiceType                       => Instance.ServiceType;
+        public static SequentialGuid SessionId                      => Instance.SessionId;
+        public static SequentialGuid UserProfileId                  => Instance.UserProfileId;
 
-        public static bool TryGetMetadata<T>(string key, out T value) 
+
+
+        private class ServiceContextWrapper { public RequestContext RequestContext; }
+
+        /// wrapping the Immutable ServiceContext value in a mutable wrapper class instance which internal AsyncLocal stores,
+        /// so changes are done to the wrapper, not the immutable Stext.  This workaround is for maintaining a reference
+        /// to the same ServiceContext on both async context entry and exit.
+        /// NOTE: This structure only works with single linear async strand(flow) like a "logical thread"
+        /// as it uses the mutable value, it should not be transacted from multi-threaded child callers, such as
+        /// forking sub-tasks
+        private static readonly AsyncLocal<ServiceContextWrapper> _Instance = new AsyncLocal<ServiceContextWrapper>();
+
+        internal static RequestContext Instance
+        {
+            get => _Instance?.Value?.RequestContext ?? RequestContext.Empty;
+            set
+            {
+                if (_Instance.Value is null)
+                {
+                    _Instance.Value = new ServiceContextWrapper() { RequestContext = value };
+                    return;
+                }
+
+                _Instance.Value.RequestContext = value;
+            }
+        }
+
+        public static bool ContainsMetadata<T>(string key)
+            where T : class, new() =>
+            Metadata.ContainsKey(key);
+
+        public static bool ContainsMetadata<T>()
+            where T : class, new() =>
+            ContainsMetadata<T>(nameof(T));
+
+        public static void RemoveMetadata<T>(string key)
+            where T : class, new() =>
+            Instance = Metadata.ContainsKey(key) ?
+                Instance with
+                {
+                    Metadata = Metadata.Remove(key)
+                } :
+                Instance;
+
+        public static void RemoveMetadata<T>()
+            where T : class, new() =>
+            RemoveMetadata<T>(nameof(T));
+
+        public static void SetMetadata<T>(string key, T value)
+            where T : class, new() =>
+            Instance = Metadata.ContainsKey(key)
+                ? (Instance with
+                {
+                    Metadata = Metadata.SetItem(key, JsonConvert.SerializeObject(value))
+                })
+                : (Instance with
+                {
+                    Metadata = Metadata.Add(key, JsonConvert.SerializeObject(value))
+                });
+
+        public static void SetMetadata<T>(T value)
+            where T : class, new() =>
+            SetMetadata<T>(nameof(T), value);
+
+        public static bool TryGetMetadata<T>(string key, out T value)
         {
             var result = Metadata.TryGetValue(key, out var v);
 
-            if(! result)
+            if (!result)
             {
                 value = default;
                 return false;
@@ -42,45 +104,7 @@ namespace Applinate
         }
 
         public static bool TryGetMetadata<T>(out T value)
-            where T:class, new() => 
+            where T : class, new() =>
             TryGetMetadata<T>(nameof(T), out value);
-
-        public static bool ContainsMetadata<T>(string key)
-            where T : class, new() => 
-            Metadata.ContainsKey(key);
-
-        public static bool ContainsMetadata<T>()
-            where T : class, new() => 
-            ContainsMetadata<T>(nameof(T));
-
-        public static void SetMetadata<T>(string key, T value)
-            where T : class, new() =>
-            RequestContext.Current = Metadata.ContainsKey(key)
-                ? (RequestContext.Current with
-                {
-                    Metadata = Metadata.SetItem(key, JsonConvert.SerializeObject(value))
-                })
-                : (RequestContext.Current with
-                {
-                    Metadata = Metadata.Add(key, JsonConvert.SerializeObject(value))
-                });
-
-        public static void SetMetadata<T>(T value)
-            where T : class, new() =>
-            SetMetadata<T>(nameof(T), value);
-
-        public static void RemoveMetadata<T>(string key)
-            where T : class, new() =>
-            RequestContext.Current = Metadata.ContainsKey(key) ?
-                RequestContext.Current with
-                {
-                    Metadata = Metadata.Remove(key)
-                } :
-                RequestContext.Current;
-
-        public static void RemoveMetadata<T>()
-            where T : class, new() =>
-            RemoveMetadata<T>(nameof(T));
-
     }
 }
