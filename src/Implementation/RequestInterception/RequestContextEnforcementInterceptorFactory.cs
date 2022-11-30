@@ -27,7 +27,7 @@ namespace Applinate.Foundation.Commands.Interceptors
             TRequest request,
             CancellationToken cancellationToken)
         {
-            var currentServiceType = RequestContext.Current?.ServiceType ?? ServiceType.None;
+            var currentServiceType = RequestContextProvider.Instance?.ServiceType ?? ServiceType.None;
 
             if (currentServiceType == ServiceType.None)
             {

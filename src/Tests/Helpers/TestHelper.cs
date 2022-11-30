@@ -121,28 +121,24 @@ namespace Applinate.Test
         /// <param name="func">The function used to generate the desired result</param>
         //public static void SetCacheResultForTestDuration<TCachedItem>(Func<string, TCachedItem> func) =>
         //    MockCache.Set(func);        
-
-
         public static void SetRequestContext(ServiceType commandType) =>
-            RequestContext.Current =
-                new RequestContext(
-                    currentServiceType    : commandType,
+            RequestContextProvider.Instance =
+                new(currentServiceType    : commandType,
                     sessionId             : SequentialGuid.NewGuid(),
                     conversationId        : SequentialGuid.NewGuid(),
                     appContext            : new AppContextKey(SequentialGuid.NewGuid(), 0,0,1),
-                    requestCallCount      : RequestContext.Current.RequestCallCount,
-                    decoratorCallCount    : RequestContext.Current.DecoratorCallCount,
-                    metadata              : RequestContext.Current.Metadata);
+                    requestCallCount      : RequestContextProvider.Instance.RequestCallCount,
+                    decoratorCallCount    : RequestContextProvider.Instance.DecoratorCallCount,
+                    metadata              : RequestContextProvider.Instance.Metadata);
 
-        public static void SetRequestContextMetadata(IDictionary<string, StringValues> md) =>
-            RequestContext.Current =
-                new RequestContext(
-                    currentServiceType    : RequestContext.Current.ServiceType,
+        public static void SetRequestContextMetadata(IDictionary<string, string> md) =>
+            RequestContextProvider.Instance =
+                new(currentServiceType    : RequestContextProvider.Instance.ServiceType,
                     sessionId             : SequentialGuid.NewGuid(),
                     conversationId        : SequentialGuid.NewGuid(),
                     appContext            : new AppContextKey(SequentialGuid.NewGuid(), 0, 0, 1),
-                    requestCallCount      : RequestContext.Current.RequestCallCount,
-                    decoratorCallCount    : RequestContext.Current.DecoratorCallCount,
+                    requestCallCount      : RequestContextProvider.Instance.RequestCallCount,
+                    decoratorCallCount    : RequestContextProvider.Instance.DecoratorCallCount,
                     metadata              : md.ToImmutableDictionary());
     }
 }
